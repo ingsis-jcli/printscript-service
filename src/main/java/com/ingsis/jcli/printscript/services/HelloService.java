@@ -1,7 +1,7 @@
-package com.ingsis.jcli.printscript_service.services;
+package com.ingsis.jcli.printscript.services;
 
-import com.ingsis.jcli.printscript_service.clients.PermissionsClient;
-import com.ingsis.jcli.printscript_service.clients.SnippetsClient;
+import com.ingsis.jcli.printscript.clients.PermissionsClient;
+import com.ingsis.jcli.printscript.clients.SnippetsClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,9 @@ public class HelloService {
     return permissionsClient.hello();
   }
 
-  public String getHelloFromSnippetsServer() { return snippetsClient.hello(); }
+  public String getHelloFromSnippetsServer() {
+    return snippetsClient.hello();
+  }
 
   public String getHello() {
     return "Hello from printscript service!";

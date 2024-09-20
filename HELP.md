@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'com.ingsis.jcli.printscript-service' is invalid and this project uses 'com.ingsis.jcli.printscript_service' instead.
+* The original package name 'com.ingsis.jcli.printscript-service' is invalid and this project uses 'com.ingsis.jcli.printscript' instead.
 
 # Getting Started
 
