@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("hello/")
+@RequestMapping("hello")
 public class HelloController {
   private final HelloService helloService;
 
@@ -16,12 +16,12 @@ public class HelloController {
     this.helloService = helloService;
   }
 
-  @GetMapping("permissions")
+  @GetMapping("/permissions")
   public String helloPermissions() {
     return helloService.getHelloFromPermissionsServer();
   }
 
-  @GetMapping("snippets")
+  @GetMapping("/snippets")
   public String helloSnippets() {
     return helloService.getHelloFromSnippetsServer();
   }
