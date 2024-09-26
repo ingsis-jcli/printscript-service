@@ -1,8 +1,4 @@
 FROM gradle:8.10.1-jdk21-jammy AS build
-ARG GITHUB_USERNAME
-ARG GITHUB_TOKEN
-ENV USERNAME=${GITHUB_USERNAME}
-ENV TOKEN=${GITHUB_TOKEN}
 COPY  . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle assemble

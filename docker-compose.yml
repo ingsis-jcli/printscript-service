@@ -11,5 +11,6 @@ services:
         GITHUB_TOKEN: ${TOKEN}
     ports:
       - 8082:8080
-    env_file:
-      - .env
+    environment:
+      - USERNAME=${USERNAME}
+      - TOKEN=${TOKEN}
