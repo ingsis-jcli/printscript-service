@@ -1,7 +1,7 @@
 package com.ingsis.jcli.printscript.common;
 
 public enum OperationType {
-  EXECUTE("execute"),
+  EXECUTE("interpreter"),
   FORMAT("formatter"),
   ANALYZE("analyzer");
 

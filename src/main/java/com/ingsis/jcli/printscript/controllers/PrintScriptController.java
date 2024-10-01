@@ -2,6 +2,7 @@ package com.ingsis.jcli.printscript.controllers;
 
 import com.ingsis.jcli.printscript.common.PermissionType;
 import com.ingsis.jcli.printscript.dto.AnalyzerResponse;
+import com.ingsis.jcli.printscript.dto.ExecuterResponse;
 import com.ingsis.jcli.printscript.dto.FormatterResponse;
 import com.ingsis.jcli.printscript.services.PermissionService;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
@@ -56,6 +57,18 @@ public class PrintScriptController {
       String report = printScriptService.analyze(snippet, config);
       AnalyzerResponse response = new AnalyzerResponse(snippetId, report);
       return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+  }
+
+  @GetMapping("/execute")
+  public ResponseEntity<ExecuterResponse> execute(
+      @RequestParam Long userId, @RequestParam Long snippetId, @RequestParam String snippet) {
+
+    if (!permissionService.hasPermission(PermissionType.EXECUTE, snippetId, userId)) {
+      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    } else {
+      String result = printScriptService.execute(snippet);
+      return new ResponseEntity<>(new ExecuterResponse(snippetId, result), HttpStatus.OK);
     }
   }
 }

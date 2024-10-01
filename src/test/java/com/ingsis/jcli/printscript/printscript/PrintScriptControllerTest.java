@@ -75,4 +75,27 @@ public class PrintScriptControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().json(response));
   }
+
+  @Test
+  void testExecute() throws Exception {
+    Long userId = 1L;
+    Long snippetId = 1L;
+    String input = getStringFromFile(OperationType.EXECUTE, "test1", FileType.INPUT).get();
+    String expected = getStringFromFile(OperationType.EXECUTE, "test1", FileType.OUTPUT).get();
+    when(permissionService.hasPermission(PermissionType.EXECUTE, userId, snippetId))
+        .thenReturn(true);
+    when(printScriptService.execute(input)).thenReturn(expected);
+    JsonObject responseJson = new JsonObject();
+    responseJson.addProperty("snippetId", snippetId);
+    responseJson.addProperty("output", expected);
+    String response = responseJson.toString();
+    mockMvc
+        .perform(
+            get("/printscript/execute")
+                .param("userId", userId.toString())
+                .param("snippetId", snippetId.toString())
+                .param("snippet", input))
+        .andExpect(status().isOk())
+        .andExpect(content().json(response));
+  }
 }

@@ -48,4 +48,16 @@ public class PrintScriptServiceTest {
       assert output.equals(expected.get());
     }
   }
+
+  @Test
+  void testExecute() {
+    List<String> cases = List.of("test1");
+    for (String caseName : cases) {
+      Optional<String> input = getStringFromFile(OperationType.EXECUTE, caseName, FileType.INPUT);
+      Optional<String> expected =
+          getStringFromFile(OperationType.EXECUTE, caseName, FileType.OUTPUT);
+      String output = printScriptService.execute(input.get());
+      assert output.equals(expected.get());
+    }
+  }
 }

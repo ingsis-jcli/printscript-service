@@ -1,0 +1,6 @@
+let a : boolean = true;
+if (a) {
+    println(2 + 2);
+} else {
+    println(2 - 2);
+}
