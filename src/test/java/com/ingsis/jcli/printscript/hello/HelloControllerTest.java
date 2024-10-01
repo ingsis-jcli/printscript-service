@@ -1,4 +1,4 @@
-package com.ingsis.jcli.printscript;
+package com.ingsis.jcli.printscript.hello;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

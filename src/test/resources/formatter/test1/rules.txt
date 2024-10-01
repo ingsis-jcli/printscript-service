@@ -1,0 +1,7 @@
+{
+  "declaration_space_before_colon": true,
+  "declaration_space_after_colon": true,
+  "assignment_space_before_equals": true,
+  "assignment_space_after_equals": true,
+  "println_new_lines_before_call": 0
+}

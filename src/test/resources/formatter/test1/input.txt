@@ -1,0 +1,3 @@
+let     a:number=13*4
+;
+let   b :string  =   "hi" ;

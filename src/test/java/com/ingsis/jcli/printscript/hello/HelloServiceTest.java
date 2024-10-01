@@ -1,4 +1,4 @@
-package com.ingsis.jcli.printscript;
+package com.ingsis.jcli.printscript.hello;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
