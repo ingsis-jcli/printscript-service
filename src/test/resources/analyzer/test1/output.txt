@@ -1,0 +1,1 @@
+Invalid identifier name: Camel_SnakeCaseMIX at position LexicalRange(offset=6, line=0, column=6)

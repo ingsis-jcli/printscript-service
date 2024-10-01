@@ -41,4 +41,18 @@ public class PermissionsServiceTest {
     verify(permissionsClient).hasPermission(PermissionType.FORMAT.name, 1L, 2L);
     verify(permissionsClient).hasPermission(PermissionType.FORMAT.name, 1L, 1L);
   }
+
+  @Test
+  void testPermissionAnalyze() {
+    when(permissionsClient.hasPermission(PermissionType.ANALYZE.name, 1L, 2L))
+        .thenReturn(ResponseEntity.ok(true));
+    when(permissionsClient.hasPermission(PermissionType.ANALYZE.name, 1L, 1L))
+        .thenReturn(ResponseEntity.ok(false));
+    boolean permission = permissionsService.hasPermission(PermissionType.ANALYZE, 2L, 1L);
+    assertTrue(permission);
+    boolean permission2 = permissionsService.hasPermission(PermissionType.ANALYZE, 1L, 1L);
+    assertFalse(permission2);
+    verify(permissionsClient).hasPermission(PermissionType.ANALYZE.name, 1L, 2L);
+    verify(permissionsClient).hasPermission(PermissionType.ANALYZE.name, 1L, 1L);
+  }
 }

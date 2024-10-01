@@ -1,0 +1,5 @@
+Error in println function: The readInput function only accepts identifiers or literals as arguments.
+Argument 1 is invalid:
+ - Type: BinaryExpressionNode
+ - Position: LexicalRange(offset=10, line=0, column=10)
+ - Content: "Enter a " + "number: "

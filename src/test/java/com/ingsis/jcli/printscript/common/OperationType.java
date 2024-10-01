@@ -3,7 +3,7 @@ package com.ingsis.jcli.printscript.common;
 public enum OperationType {
   EXECUTE("execute"),
   FORMAT("formatter"),
-  ANALYZE("analyze");
+  ANALYZE("analyzer");
 
   public final String name;
 
