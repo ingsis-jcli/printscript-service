@@ -28,8 +28,8 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v4
         env:
-            GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            USERNAME: ${{ secrets.GITHUB_ACTOR }}
+            TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           push: true
           tags: |
