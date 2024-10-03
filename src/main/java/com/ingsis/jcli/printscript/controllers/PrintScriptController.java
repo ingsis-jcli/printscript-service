@@ -1,10 +1,5 @@
 package com.ingsis.jcli.printscript.controllers;
 
-import com.ingsis.jcli.printscript.common.PermissionType;
-import com.ingsis.jcli.printscript.dto.AnalyzerResponse;
-import com.ingsis.jcli.printscript.dto.ExecuterResponse;
-import com.ingsis.jcli.printscript.dto.FormatterResponse;
-import com.ingsis.jcli.printscript.services.PermissionService;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,56 +14,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class PrintScriptController {
 
   final PrintScriptService printScriptService;
-  final PermissionService permissionService;
 
   @Autowired
-  public PrintScriptController(
-      PrintScriptService printScriptService, PermissionService permissionService) {
+  public PrintScriptController(PrintScriptService printScriptService) {
     this.printScriptService = printScriptService;
-    this.permissionService = permissionService;
   }
 
   @GetMapping("/format")
-  public ResponseEntity<FormatterResponse> format(
-      @RequestParam Long userId,
-      @RequestParam Long snippetId,
-      @RequestParam String snippet,
-      @RequestParam String config) {
-
-    if (!permissionService.hasPermission(PermissionType.FORMAT, snippetId, userId)) {
-      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    } else {
-      String formattedSnippet = printScriptService.format(snippet, config);
-      FormatterResponse response = new FormatterResponse(snippetId, formattedSnippet);
-      return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+  public ResponseEntity<String> format(@RequestParam String snippet, @RequestParam String config) {
+    String formattedSnippet = printScriptService.format(snippet, config);
+    return new ResponseEntity<>(formattedSnippet, HttpStatus.OK);
   }
 
   @GetMapping("/analyze")
-  public ResponseEntity<AnalyzerResponse> analyze(
-      @RequestParam Long userId,
-      @RequestParam Long snippetId,
-      @RequestParam String snippet,
-      @RequestParam String config) {
-
-    if (!permissionService.hasPermission(PermissionType.ANALYZE, snippetId, userId)) {
-      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    } else {
-      String report = printScriptService.analyze(snippet, config);
-      AnalyzerResponse response = new AnalyzerResponse(snippetId, report);
-      return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+  public ResponseEntity<String> analyze(@RequestParam String snippet, @RequestParam String config) {
+    String report = printScriptService.analyze(snippet, config);
+    return new ResponseEntity<>(report, HttpStatus.OK);
   }
 
   @GetMapping("/execute")
-  public ResponseEntity<ExecuterResponse> execute(
-      @RequestParam Long userId, @RequestParam Long snippetId, @RequestParam String snippet) {
-
-    if (!permissionService.hasPermission(PermissionType.EXECUTE, snippetId, userId)) {
-      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    } else {
-      String result = printScriptService.execute(snippet);
-      return new ResponseEntity<>(new ExecuterResponse(snippetId, result), HttpStatus.OK);
-    }
+  public ResponseEntity<String> execute(@RequestParam String snippet) {
+    String result = printScriptService.execute(snippet);
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }

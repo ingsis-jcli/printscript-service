@@ -6,12 +6,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.google.gson.JsonObject;
 import com.ingsis.jcli.printscript.common.FileType;
 import com.ingsis.jcli.printscript.common.OperationType;
-import com.ingsis.jcli.printscript.common.PermissionType;
 import com.ingsis.jcli.printscript.controllers.PrintScriptController;
-import com.ingsis.jcli.printscript.services.PermissionService;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,77 +22,38 @@ public class PrintScriptControllerTest {
 
   @MockBean private PrintScriptService printScriptService;
 
-  @MockBean private PermissionService permissionService;
-
   @Test
   void testFormat() throws Exception {
-    Long userId = 1L;
-    Long snippetId = 1L;
     String input = getStringFromFile(OperationType.FORMAT, "test1", FileType.INPUT).get();
     String expected = getStringFromFile(OperationType.FORMAT, "test1", FileType.OUTPUT).get();
     String rules = getStringFromFile(OperationType.FORMAT, "test1", FileType.RULES).get();
-    when(permissionService.hasPermission(PermissionType.FORMAT, userId, snippetId))
-        .thenReturn(true);
     when(printScriptService.format(input, rules)).thenReturn(expected);
-    String formattedResponse =
-        "{\"snippetId\":1,"
-            + "\"formattedSnippet\":\"let a : number = 13 * 4;\\nlet b : string = \\\"hi\\\";\"}";
     mockMvc
-        .perform(
-            get("/printscript/format")
-                .param("userId", userId.toString())
-                .param("snippetId", snippetId.toString())
-                .param("snippet", input)
-                .param("config", rules))
+        .perform(get("/printscript/format").param("snippet", input).param("config", rules))
         .andExpect(status().isOk())
-        .andExpect(content().json(formattedResponse));
+        .andExpect(content().string(expected));
   }
 
   @Test
   void testAnalyze() throws Exception {
-    Long userId = 1L;
-    Long snippetId = 1L;
     String input = getStringFromFile(OperationType.ANALYZE, "test1", FileType.INPUT).get();
     String expected = getStringFromFile(OperationType.ANALYZE, "test1", FileType.OUTPUT).get();
     String rules = getStringFromFile(OperationType.ANALYZE, "test1", FileType.RULES).get();
-    when(permissionService.hasPermission(PermissionType.ANALYZE, userId, snippetId))
-        .thenReturn(true);
     when(printScriptService.analyze(input, rules)).thenReturn(expected);
-    JsonObject responseJson = new JsonObject();
-    responseJson.addProperty("snippetId", snippetId);
-    responseJson.addProperty("report", expected);
-    String response = responseJson.toString();
     mockMvc
-        .perform(
-            get("/printscript/analyze")
-                .param("userId", userId.toString())
-                .param("snippetId", snippetId.toString())
-                .param("snippet", input)
-                .param("config", rules))
+        .perform(get("/printscript/analyze").param("snippet", input).param("config", rules))
         .andExpect(status().isOk())
-        .andExpect(content().json(response));
+        .andExpect(content().string(expected));
   }
 
   @Test
   void testExecute() throws Exception {
-    Long userId = 1L;
-    Long snippetId = 1L;
     String input = getStringFromFile(OperationType.EXECUTE, "test1", FileType.INPUT).get();
     String expected = getStringFromFile(OperationType.EXECUTE, "test1", FileType.OUTPUT).get();
-    when(permissionService.hasPermission(PermissionType.EXECUTE, userId, snippetId))
-        .thenReturn(true);
     when(printScriptService.execute(input)).thenReturn(expected);
-    JsonObject responseJson = new JsonObject();
-    responseJson.addProperty("snippetId", snippetId);
-    responseJson.addProperty("output", expected);
-    String response = responseJson.toString();
     mockMvc
-        .perform(
-            get("/printscript/execute")
-                .param("userId", userId.toString())
-                .param("snippetId", snippetId.toString())
-                .param("snippet", input))
+        .perform(get("/printscript/execute").param("snippet", input))
         .andExpect(status().isOk())
-        .andExpect(content().json(response));
+        .andExpect(content().string(expected));
   }
 }
