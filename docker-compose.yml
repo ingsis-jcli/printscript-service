@@ -5,7 +5,7 @@ services:
     container_name: "printscript-api"
     build:
       context: .
-      dockerfile: Dockerfile.multi
+      dockerfile: Dockerfile
       args:
         GITHUB_USERNAME: ${USERNAME}
         GITHUB_TOKEN: ${TOKEN}
