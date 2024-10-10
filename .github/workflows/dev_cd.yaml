@@ -27,10 +27,10 @@ jobs:
       - name: Push to GitHub Packages
         id: docker_build
         uses: docker/build-push-action@v4
-        env:
-            USERNAME: ${{ env.GITHUB_ACTOR }}
-            TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           push: true
           tags: |
             ghcr.io/ingsis-jcli/printscript-dev:latest
+          build-args: |
+            USERNAME: ${{ env.GITHUB_ACTOR }}
+            TOKEN: ${{ secrets.GITHUB_TOKEN }}
