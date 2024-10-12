@@ -32,5 +32,5 @@ jobs:
           tags: |
             ghcr.io/ingsis-jcli/printscript-dev:latest
           build-args: |
-            USERNAME: ${{ env.GITHUB_ACTOR }}
-            TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            USERNAME=${{ github.actor }}
+            TOKEN=${{ secrets.GITHUB_TOKEN }}
