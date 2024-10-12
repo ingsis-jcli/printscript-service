@@ -7,10 +7,10 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        USERNAME: ${GITHUB_ACTOR}
-        TOKEN: ${GITHUB_TOKEN}
+        USERNAME: "${GITHUB_ACTOR}"
+        TOKEN: "${GITHUB_TOKEN}"
     ports:
       - 8082:8080
     environment:
-      GITHUB_ACTOR: ${GITHUB_ACTOR}
-      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      GITHUB_ACTOR: "${GITHUB_ACTOR}"
+      GITHUB_TOKEN: "${GITHUB_TOKEN}"
