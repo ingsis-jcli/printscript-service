@@ -14,22 +14,35 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(PrintScriptController.class)
+@ActiveProfiles("test")
 public class PrintScriptControllerTest {
+
   @Autowired private MockMvc mockMvc;
 
   @MockBean private PrintScriptService printScriptService;
+
+  @MockBean private JwtDecoder jwtDecoder;
 
   @Test
   void testFormat() throws Exception {
     String input = getStringFromFile(OperationType.FORMAT, "test1", FileType.INPUT).get();
     String expected = getStringFromFile(OperationType.FORMAT, "test1", FileType.OUTPUT).get();
     String rules = getStringFromFile(OperationType.FORMAT, "test1", FileType.RULES).get();
+
     when(printScriptService.format(input, rules)).thenReturn(expected);
+
     mockMvc
-        .perform(get("/printscript/format").param("snippet", input).param("config", rules))
+        .perform(
+            get("/printscript/format")
+                .param("snippet", input)
+                .param("config", rules)
+                .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
         .andExpect(content().string(expected));
   }
@@ -39,9 +52,15 @@ public class PrintScriptControllerTest {
     String input = getStringFromFile(OperationType.ANALYZE, "test1", FileType.INPUT).get();
     String expected = getStringFromFile(OperationType.ANALYZE, "test1", FileType.OUTPUT).get();
     String rules = getStringFromFile(OperationType.ANALYZE, "test1", FileType.RULES).get();
+
     when(printScriptService.analyze(input, rules)).thenReturn(expected);
+
     mockMvc
-        .perform(get("/printscript/analyze").param("snippet", input).param("config", rules))
+        .perform(
+            get("/printscript/analyze")
+                .param("snippet", input)
+                .param("config", rules)
+                .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
         .andExpect(content().string(expected));
   }
@@ -50,9 +69,14 @@ public class PrintScriptControllerTest {
   void testExecute() throws Exception {
     String input = getStringFromFile(OperationType.EXECUTE, "test1", FileType.INPUT).get();
     String expected = getStringFromFile(OperationType.EXECUTE, "test1", FileType.OUTPUT).get();
+
     when(printScriptService.execute(input)).thenReturn(expected);
+
     mockMvc
-        .perform(get("/printscript/execute").param("snippet", input))
+        .perform(
+            get("/printscript/execute")
+                .param("snippet", input)
+                .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
         .andExpect(content().string(expected));
   }

@@ -41,6 +41,12 @@ dependencies {
     implementation 'com.ingsis.jcli:runner:1.1.13'
     implementation 'com.ingsis.jcli:common:1.1.13'
     implementation 'com.google.code.gson:gson:2.8.9'
+
+    // Auth0 Configuration
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    testImplementation 'org.springframework.security:spring-security-test'
+
 }
 
 dependencyManagement {  // for openfeign
