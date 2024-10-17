@@ -38,8 +38,6 @@ public class Auth0Configuration {
                     .requestMatchers("/")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/hello/create")
-                    .hasAuthority("SCOPE_read:snippets")
-                    .anyRequest()
                     .authenticated())
         .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
         .cors(cors -> cors.disable())
