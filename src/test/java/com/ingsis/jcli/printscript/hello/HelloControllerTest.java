@@ -1,6 +1,8 @@
 package com.ingsis.jcli.printscript.hello;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.oauth2.jwt.Jwt.withTokenValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,10 +41,16 @@ class HelloControllerTest {
 
   @Test
   void testGetHelloFromSnippets() throws Exception {
-    when(helloService.getHelloFromSnippetsServer()).thenReturn("Hello from snippets service!");
-
+    when(helloService.getHelloFromSnippetsServer(anyString()))
+        .thenReturn("Hello from snippets service!");
+    Jwt mockJwt =
+        withTokenValue("mock-jwt-token")
+            .header("alg", "none")
+            .claim("scope", "read:snippets")
+            .build();
     mockMvc
-        .perform(get("/hello/snippets").with(SecurityMockMvcRequestPostProcessors.jwt()))
+        .perform(
+            get("/hello/snippets").with(SecurityMockMvcRequestPostProcessors.jwt().jwt(mockJwt)))
         .andExpect(status().isOk())
         .andExpect(content().string("Hello from snippets service!"));
   }
