@@ -1,6 +1,5 @@
 package com.ingsis.jcli.printscript.hello;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.oauth2.jwt.Jwt.withTokenValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -41,8 +40,7 @@ class HelloControllerTest {
 
   @Test
   void testGetHelloFromSnippets() throws Exception {
-    when(helloService.getHelloFromSnippetsServer(anyString()))
-        .thenReturn("Hello from snippets service!");
+    when(helloService.getHelloFromSnippetsServer()).thenReturn("Hello from snippets service!");
     Jwt mockJwt =
         withTokenValue("mock-jwt-token")
             .header("alg", "none")

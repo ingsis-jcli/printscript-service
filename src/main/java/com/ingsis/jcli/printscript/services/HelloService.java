@@ -21,7 +21,7 @@ public class HelloService {
     return permissionsClient.hello();
   }
 
-  public String getHelloFromSnippetsServer(String token) {
+  public String getHelloFromSnippetsServer() {
     return snippetsClient.hello();
   }
 
