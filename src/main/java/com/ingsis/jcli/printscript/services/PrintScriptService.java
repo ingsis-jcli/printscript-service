@@ -49,4 +49,16 @@ public class PrintScriptService {
       return consoleResult.getResult();
     }
   }
+
+  public String validate(String snippet) {
+    InputStream code = getInputStreamFromString(snippet);
+    ConsoleResult consoleResult = new ConsoleResult();
+    try {
+      runner.validate(code);
+      return consoleResult.getResult();
+    } catch (Exception e) {
+      consoleResult.append(e.getMessage());
+      return consoleResult.getResult();
+    }
+  }
 }

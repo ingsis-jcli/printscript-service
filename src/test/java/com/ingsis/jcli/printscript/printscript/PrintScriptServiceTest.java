@@ -51,11 +51,23 @@ public class PrintScriptServiceTest {
 
   @Test
   void testExecute() {
-    List<String> cases = List.of("test1");
+    List<String> cases = List.of("test1", "test2");
     for (String caseName : cases) {
       Optional<String> input = getStringFromFile(OperationType.EXECUTE, caseName, FileType.INPUT);
       Optional<String> expected =
           getStringFromFile(OperationType.EXECUTE, caseName, FileType.OUTPUT);
+      String output = printScriptService.execute(input.get());
+      assert output.equals(expected.get());
+    }
+  }
+
+  @Test
+  void testValidate() {
+    List<String> cases = List.of("test1", "test2", "test3");
+    for (String caseName : cases) {
+      Optional<String> input = getStringFromFile(OperationType.VALIDATE, caseName, FileType.INPUT);
+      Optional<String> expected =
+          getStringFromFile(OperationType.VALIDATE, caseName, FileType.OUTPUT);
       String output = printScriptService.execute(input.get());
       assert output.equals(expected.get());
     }

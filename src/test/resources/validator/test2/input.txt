@@ -1,0 +1,5 @@
+if (var) {
+    var = 10;
+} else {
+    println("hihi");
+}

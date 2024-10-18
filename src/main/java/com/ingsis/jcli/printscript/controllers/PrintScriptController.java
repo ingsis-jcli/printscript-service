@@ -20,6 +20,12 @@ public class PrintScriptController {
     this.printScriptService = printScriptService;
   }
 
+  @GetMapping("/validate")
+  public ResponseEntity<String> validate(@RequestParam String snippet) {
+    String formattedSnippet = printScriptService.validate(snippet);
+    return new ResponseEntity<>(formattedSnippet, HttpStatus.OK);
+  }
+
   @GetMapping("/format")
   public ResponseEntity<String> format(@RequestParam String snippet, @RequestParam String config) {
     String formattedSnippet = printScriptService.format(snippet, config);
