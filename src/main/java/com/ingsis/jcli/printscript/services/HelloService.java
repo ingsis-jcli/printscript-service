@@ -22,7 +22,7 @@ public class HelloService {
   }
 
   public String getHelloFromSnippetsServer(String token) {
-    return snippetsClient.hello(token);
+    return snippetsClient.hello();
   }
 
   public String getHello() {

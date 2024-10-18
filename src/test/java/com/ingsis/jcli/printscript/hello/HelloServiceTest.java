@@ -42,9 +42,9 @@ class HelloServiceTest {
 
   @Test
   void testGetHelloFromSnippets() {
-    when(snippetsClient.hello("1")).thenReturn("Hello from snippets service!");
+    when(snippetsClient.hello()).thenReturn("Hello from snippets service!");
     String result = helloService.getHelloFromSnippetsServer("1");
     assertEquals("Hello from snippets service!", result);
-    verify(snippetsClient).hello("1");
+    verify(snippetsClient).hello();
   }
 }
