@@ -2,7 +2,7 @@ package com.ingsis.jcli.printscript.printscript;
 
 import static com.ingsis.jcli.printscript.common.TestUtils.getStringFromFile;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,7 +43,7 @@ public class PrintScriptControllerTest {
 
     mockMvc
         .perform(
-            get("/printscript/format")
+            post("/printscript/format")
                 .param("snippet", input)
                 .param("config", rules)
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -61,7 +61,7 @@ public class PrintScriptControllerTest {
 
     mockMvc
         .perform(
-            get("/printscript/analyze")
+            post("/printscript/analyze")
                 .param("snippet", input)
                 .param("config", rules)
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -78,7 +78,7 @@ public class PrintScriptControllerTest {
 
     mockMvc
         .perform(
-            get("/printscript/execute")
+            post("/printscript/execute")
                 .param("snippet", input)
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
@@ -98,7 +98,7 @@ public class PrintScriptControllerTest {
 
       mockMvc
           .perform(
-              get("/printscript/validate")
+              post("/printscript/validate")
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(asJsonString(req))
                   .with(SecurityMockMvcRequestPostProcessors.jwt()))
