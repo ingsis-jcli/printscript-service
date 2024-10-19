@@ -6,8 +6,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ingsis.jcli.printscript.common.FileType;
 import com.ingsis.jcli.printscript.common.OperationType;
+import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
 import com.ingsis.jcli.printscript.controllers.PrintScriptController;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
@@ -91,13 +94,24 @@ public class PrintScriptControllerTest {
 
       when(printScriptService.validate(input)).thenReturn(expected);
 
+      ValidateRequest req = new ValidateRequest(input, "1.1");
+
       mockMvc
           .perform(
               get("/printscript/validate")
-                  .param("snippet", input)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(req))
                   .with(SecurityMockMvcRequestPostProcessors.jwt()))
           .andExpect(status().isOk())
           .andExpect(content().string(expected));
+    }
+  }
+
+  public static String asJsonString(final Object obj) {
+    try {
+      return new ObjectMapper().writeValueAsString(obj);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }
