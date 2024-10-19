@@ -22,7 +22,7 @@ public class PrintScriptController {
     this.printScriptService = printScriptService;
   }
 
-  @PostMapping("/validate")
+  @PostMapping(value = "/validate", consumes = "application/json")
   public ResponseEntity<String> validate(@RequestBody ValidateRequest validateRequest) {
     // TODO: use version
     String formattedSnippet = printScriptService.validate(validateRequest.snippet());
