@@ -12,8 +12,12 @@ import edu.FormatterResult;
 import edu.Report;
 import edu.Runner;
 import java.io.InputStream;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class PrintScriptService {
   private final Runner runner;
@@ -51,12 +55,17 @@ public class PrintScriptService {
   }
 
   public String validate(String snippet) {
+    Marker marker = MarkerFactory.getMarker("Validate");
+    log.info(marker, "Validating snippet: " + snippet);
+
     InputStream code = getInputStreamFromString(snippet);
     ConsoleResult consoleResult = new ConsoleResult();
     try {
       runner.validate(code);
+      log.info(marker, "Validated snippet: " + snippet);
       return consoleResult.getResult();
     } catch (Exception e) {
+      log.error(marker, "Error validating snippet: " + e.getMessage());
       consoleResult.append(e.getMessage());
       return consoleResult.getResult();
     }
