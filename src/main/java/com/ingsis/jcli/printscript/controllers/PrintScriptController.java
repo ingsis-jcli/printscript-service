@@ -1,6 +1,7 @@
 package com.ingsis.jcli.printscript.controllers;
 
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
+import com.ingsis.jcli.printscript.common.responses.ValidateResponse;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
@@ -27,16 +28,18 @@ public class PrintScriptController {
   }
 
   @PostMapping(value = "/validate", consumes = "application/json")
-  public ResponseEntity<String> validate(@RequestBody ValidateRequest validateRequest) {
+  public ResponseEntity<ValidateResponse> validate(@RequestBody ValidateRequest validateRequest) {
     Marker marker = MarkerFactory.getMarker("Validate");
     log.info(marker, "ValidateRequest received: " + validateRequest);
 
     // TODO: use version
-    String validatedSnippet = printScriptService.validate(validateRequest.snippet());
-    log.info(marker, "printscript response: \"" + validatedSnippet + "\"");
-    log.info(marker, "printscript response is null? " + (validatedSnippet == null));
+    ValidateResponse response = printScriptService.validate(validateRequest.snippet());
+    log.info(marker, "printscript response: \"" + response + "\"");
 
-    return new ResponseEntity<>(validatedSnippet, HttpStatus.OK);
+    if (response.isValid()) {
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // TODO: custom status code?
   }
 
   @PostMapping("/format")

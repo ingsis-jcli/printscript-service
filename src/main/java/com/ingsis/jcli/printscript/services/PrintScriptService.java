@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.ingsis.jcli.printscript.common.ConsoleResult;
 import com.ingsis.jcli.printscript.common.PrintAccumulator;
 import com.ingsis.jcli.printscript.common.UiInputProvider;
+import com.ingsis.jcli.printscript.common.responses.ValidateResponse;
 import edu.FormatterResult;
 import edu.Report;
 import edu.Runner;
@@ -54,20 +55,25 @@ public class PrintScriptService {
     }
   }
 
-  public String validate(String snippet) {
+  public ValidateResponse validate(String snippet) {
     Marker marker = MarkerFactory.getMarker("Validate");
     log.info(marker, "Validating snippet: " + snippet);
 
     InputStream code = getInputStreamFromString(snippet);
     ConsoleResult consoleResult = new ConsoleResult();
+
     try {
       runner.validate(code);
       log.info(marker, "Validated snippet: " + snippet);
-      return consoleResult.getResult();
+
+      if (consoleResult.getResult() == null || consoleResult.getResult().isBlank()) {
+        return new ValidateResponse();
+      }
+      return new ValidateResponse(consoleResult.getResult());
     } catch (Exception e) {
       log.error(marker, "Error validating snippet: " + e.getMessage());
       consoleResult.append(e.getMessage());
-      return consoleResult.getResult();
+      return new ValidateResponse(consoleResult.getResult());
     }
   }
 }
