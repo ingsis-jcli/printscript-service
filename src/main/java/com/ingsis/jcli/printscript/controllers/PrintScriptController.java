@@ -33,7 +33,8 @@ public class PrintScriptController {
 
     // TODO: use version
     String validatedSnippet = printScriptService.validate(validateRequest.snippet());
-    log.info(marker, "printscript response: " + validatedSnippet);
+    log.info(marker, "printscript response: \"" + validatedSnippet + "\"");
+    log.info(marker, "printscript response is null? " + (validatedSnippet == null));
 
     return new ResponseEntity<>(validatedSnippet, HttpStatus.OK);
   }
