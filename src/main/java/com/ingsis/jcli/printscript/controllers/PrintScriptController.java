@@ -1,10 +1,12 @@
 package com.ingsis.jcli.printscript.controllers;
 
+import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +23,9 @@ public class PrintScriptController {
   }
 
   @GetMapping("/validate")
-  public ResponseEntity<String> validate(@RequestParam String snippet) {
-    String formattedSnippet = printScriptService.validate(snippet);
+  public ResponseEntity<String> validate(@RequestBody ValidateRequest validateRequest) {
+    // TODO: use version
+    String formattedSnippet = printScriptService.validate(validateRequest.snippet());
     return new ResponseEntity<>(formattedSnippet, HttpStatus.OK);
   }
 
