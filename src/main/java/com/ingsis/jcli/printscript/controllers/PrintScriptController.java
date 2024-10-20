@@ -1,8 +1,12 @@
 package com.ingsis.jcli.printscript.controllers;
 
+import com.ingsis.jcli.printscript.common.requests.AnalyzeRequest;
+import com.ingsis.jcli.printscript.common.requests.ExecuteRequest;
+import com.ingsis.jcli.printscript.common.requests.FormatRequest;
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
@@ -12,10 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -34,8 +35,8 @@ public class PrintScriptController {
     Marker marker = MarkerFactory.getMarker("Validate");
     log.info(marker, "ValidateRequest received: " + validateRequest);
 
-    // TODO: use version
-    ErrorResponse response = printScriptService.validate(validateRequest.snippet());
+    ErrorResponse response =
+        printScriptService.validate(validateRequest.snippet(), validateRequest.version());
     log.info(marker, "printscript response: \"" + response + "\"");
 
     if (Objects.equals(response.error(), "")) {
@@ -45,20 +46,24 @@ public class PrintScriptController {
   }
 
   @PostMapping("/format")
-  public ResponseEntity<String> format(@RequestParam String snippet, @RequestParam String config) {
-    String formattedSnippet = printScriptService.format(snippet, config);
+  public ResponseEntity<String> format(@RequestBody FormatRequest formatRequest) {
+    String formattedSnippet =
+        printScriptService.format(
+            formatRequest.snippet(), formatRequest.config(), formatRequest.version());
     return new ResponseEntity<>(formattedSnippet, HttpStatus.OK);
   }
 
   @PostMapping("/analyze")
-  public ResponseEntity<String> analyze(@RequestParam String snippet, @RequestParam String config) {
-    String report = printScriptService.analyze(snippet, config);
+  public ResponseEntity<String> analyze(@RequestBody AnalyzeRequest analyzeRequest) {
+    String report =
+        printScriptService.analyze(
+            analyzeRequest.snippet(), analyzeRequest.config(), analyzeRequest.version());
     return new ResponseEntity<>(report, HttpStatus.OK);
   }
 
   @PostMapping("/execute")
-  public ResponseEntity<String> execute(@RequestParam String snippet) {
-    String result = printScriptService.execute(snippet);
+  public ResponseEntity<String> execute(@RequestBody ExecuteRequest executeRequest) {
+    String result = printScriptService.execute(executeRequest.snippet(), executeRequest.version());
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }

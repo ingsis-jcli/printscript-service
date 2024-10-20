@@ -9,7 +9,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ingsis.jcli.printscript.common.FileType;
 import com.ingsis.jcli.printscript.common.OperationType;
+import com.ingsis.jcli.printscript.common.TestCaseData;
+import com.ingsis.jcli.printscript.common.requests.AnalyzeRequest;
+import com.ingsis.jcli.printscript.common.requests.ExecuteRequest;
+import com.ingsis.jcli.printscript.common.requests.FormatRequest;
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
+import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.controllers.PrintScriptController;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.util.List;
@@ -39,13 +44,15 @@ public class PrintScriptControllerTest {
     String expected = getStringFromFile(OperationType.FORMAT, "test1", FileType.OUTPUT).get();
     String rules = getStringFromFile(OperationType.FORMAT, "test1", FileType.RULES).get();
 
-    when(printScriptService.format(input, rules)).thenReturn(expected);
+    when(printScriptService.format(input, rules, "1.1")).thenReturn(expected);
+
+    FormatRequest req = new FormatRequest(input, rules, "1.1");
 
     mockMvc
         .perform(
             post("/printscript/format")
-                .param("snippet", input)
-                .param("config", rules)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(req))
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
         .andExpect(content().string(expected));
@@ -57,13 +64,15 @@ public class PrintScriptControllerTest {
     String expected = getStringFromFile(OperationType.ANALYZE, "test1", FileType.OUTPUT).get();
     String rules = getStringFromFile(OperationType.ANALYZE, "test1", FileType.RULES).get();
 
-    when(printScriptService.analyze(input, rules)).thenReturn(expected);
+    when(printScriptService.analyze(input, rules, "1.1")).thenReturn(expected);
+
+    AnalyzeRequest req = new AnalyzeRequest(input, rules, "1.1");
 
     mockMvc
         .perform(
             post("/printscript/analyze")
-                .param("snippet", input)
-                .param("config", rules)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(req))
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
         .andExpect(content().string(expected));
@@ -74,12 +83,15 @@ public class PrintScriptControllerTest {
     String input = getStringFromFile(OperationType.EXECUTE, "test1", FileType.INPUT).get();
     String expected = getStringFromFile(OperationType.EXECUTE, "test1", FileType.OUTPUT).get();
 
-    when(printScriptService.execute(input)).thenReturn(expected);
+    when(printScriptService.execute(input, "1.1")).thenReturn(expected);
+
+    ExecuteRequest req = new ExecuteRequest(input, "1.1");
 
     mockMvc
         .perform(
             post("/printscript/execute")
-                .param("snippet", input)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(req))
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
         .andExpect(content().string(expected));
@@ -87,23 +99,41 @@ public class PrintScriptControllerTest {
 
   @Test
   void testValidate() throws Exception {
-    List<String> cases = List.of("test1", "test2", "test3");
-    for (String testCase : cases) {
-      String input = getStringFromFile(OperationType.VALIDATE, testCase, FileType.INPUT).get();
-      String expected = getStringFromFile(OperationType.VALIDATE, testCase, FileType.OUTPUT).get();
+    List<TestCaseData> testCases =
+        List.of(
+            new TestCaseData("test1", false),
+            new TestCaseData("test2", false),
+            new TestCaseData("test3", true));
+    for (TestCaseData testCase : testCases) {
+      String input =
+          getStringFromFile(OperationType.VALIDATE, testCase.getName(), FileType.INPUT).get();
+      String expected =
+          getStringFromFile(OperationType.VALIDATE, testCase.getName(), FileType.OUTPUT).get();
 
-      when(printScriptService.validate(input)).thenReturn(expected);
-
+      if (testCase.isValid()) {
+        when(printScriptService.validate(input, "1.1")).thenReturn(new ErrorResponse(""));
+      } else {
+        when(printScriptService.validate(input, "1.1")).thenReturn(new ErrorResponse(expected));
+      }
       ValidateRequest req = new ValidateRequest(input, "1.1");
-
-      mockMvc
-          .perform(
-              post("/printscript/validate")
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(asJsonString(req))
-                  .with(SecurityMockMvcRequestPostProcessors.jwt()))
-          .andExpect(status().isOk())
-          .andExpect(content().string(expected));
+      if (testCase.isValid()) {
+        mockMvc
+            .perform(
+                post("/printscript/validate")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(req))
+                    .with(SecurityMockMvcRequestPostProcessors.jwt()))
+            .andExpect(status().isOk());
+      } else {
+        mockMvc
+            .perform(
+                post("/printscript/validate")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(req))
+                    .with(SecurityMockMvcRequestPostProcessors.jwt()))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().json("{\"error\":\"" + expected + "\"}"));
+      }
     }
   }
 
