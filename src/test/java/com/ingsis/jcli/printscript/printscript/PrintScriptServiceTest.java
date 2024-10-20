@@ -6,6 +6,8 @@ import com.ingsis.jcli.printscript.clients.PermissionsClient;
 import com.ingsis.jcli.printscript.clients.SnippetsClient;
 import com.ingsis.jcli.printscript.common.FileType;
 import com.ingsis.jcli.printscript.common.OperationType;
+import com.ingsis.jcli.printscript.common.TestCaseData;
+import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.util.List;
 import java.util.Optional;
@@ -63,13 +65,25 @@ public class PrintScriptServiceTest {
 
   @Test
   void testValidate() {
-    List<String> cases = List.of("test1", "test2", "test3");
-    for (String caseName : cases) {
-      Optional<String> input = getStringFromFile(OperationType.VALIDATE, caseName, FileType.INPUT);
-      Optional<String> expected =
-          getStringFromFile(OperationType.VALIDATE, caseName, FileType.OUTPUT);
-      String output = printScriptService.execute(input.get(), "1.1");
-      assert output.equals(expected.get());
+    List<TestCaseData> testCases =
+        List.of(
+            new TestCaseData("test1", false),
+            new TestCaseData("test2", false),
+            new TestCaseData("test3", true));
+
+    for (TestCaseData testCase : testCases) {
+      String input =
+          getStringFromFile(OperationType.VALIDATE, testCase.getName(), FileType.INPUT).get();
+      String expected =
+          getStringFromFile(OperationType.VALIDATE, testCase.getName(), FileType.OUTPUT).get();
+
+      ErrorResponse output = printScriptService.validate(input, "1.1");
+
+      if (testCase.isValid()) {
+        assert output.equals(new ErrorResponse(""));
+      } else {
+        assert output.equals(new ErrorResponse(expected));
+      }
     }
   }
 }
