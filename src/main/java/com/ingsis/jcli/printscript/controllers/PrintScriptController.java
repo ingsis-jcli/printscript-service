@@ -1,7 +1,7 @@
 package com.ingsis.jcli.printscript.controllers;
 
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
-import com.ingsis.jcli.printscript.common.responses.ValidateResponse;
+import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -28,16 +30,16 @@ public class PrintScriptController {
   }
 
   @PostMapping(value = "/validate", consumes = "application/json")
-  public ResponseEntity<ValidateResponse> validate(@RequestBody ValidateRequest validateRequest) {
+  public ResponseEntity<ErrorResponse> validate(@RequestBody ValidateRequest validateRequest) {
     Marker marker = MarkerFactory.getMarker("Validate");
     log.info(marker, "ValidateRequest received: " + validateRequest);
 
     // TODO: use version
-    ValidateResponse response = printScriptService.validate(validateRequest.snippet());
+    ErrorResponse response = printScriptService.validate(validateRequest.snippet());
     log.info(marker, "printscript response: \"" + response + "\"");
 
-    if (response.isValid()) {
-      return new ResponseEntity<>(response, HttpStatus.OK);
+    if (Objects.equals(response.error(), "")) {
+      return new ResponseEntity<>(HttpStatus.OK);
     }
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // TODO: custom status code?
   }
