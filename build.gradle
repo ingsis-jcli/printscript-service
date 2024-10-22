@@ -31,19 +31,6 @@ def loadEnv() {
 
 loadEnv()
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/JulietaG13/PrintScript")
-        credentials {
-            username = System.getenv('USERNAME') ?: project.GITHUB_ACTOR
-            password = System.getenv('TOKEN') ?: project.GITHUB_TOKEN
-        }
-    }
-}
-
 ext {
     set('springCloudVersion', "2023.0.3") // for openfeign
 }
@@ -64,6 +51,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // Redis MVC Library
+    implementation 'org.austral.ingsis:redis-streams-mvc:0.1.13'
+
+    // Redis reactive
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 }
 
 dependencyManagement {  // for openfeign
@@ -123,3 +117,5 @@ spotless {
         ktlint()
     }
 }
+
+apply from: 'gradle/repositories.gradle'
