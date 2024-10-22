@@ -1,6 +1,7 @@
 package com.ingsis.jcli.printscript.hello;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.security.oauth2.jwt.Jwt.withTokenValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,20 +12,28 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(HelloController.class)
+@ActiveProfiles("test")
 class HelloControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
   @MockBean private HelloService helloService;
 
+  @MockBean private JwtDecoder jwtDecoder;
+
   @Test
   void testGetHello() throws Exception {
     when(helloService.getHello()).thenReturn("Hello from printscript service!");
+
     mockMvc
-        .perform(get("/hello"))
+        .perform(get("/hello").with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
         .andExpect(content().string("Hello from printscript service!"));
   }
@@ -32,8 +41,14 @@ class HelloControllerTest {
   @Test
   void testGetHelloFromSnippets() throws Exception {
     when(helloService.getHelloFromSnippetsServer()).thenReturn("Hello from snippets service!");
+    Jwt mockJwt =
+        withTokenValue("mock-jwt-token")
+            .header("alg", "none")
+            .claim("scope", "read:snippets")
+            .build();
     mockMvc
-        .perform(get("/hello/snippets"))
+        .perform(
+            get("/hello/snippets").with(SecurityMockMvcRequestPostProcessors.jwt().jwt(mockJwt)))
         .andExpect(status().isOk())
         .andExpect(content().string("Hello from snippets service!"));
   }
@@ -42,8 +57,9 @@ class HelloControllerTest {
   void testGetHelloFromPermissions() throws Exception {
     when(helloService.getHelloFromPermissionsServer())
         .thenReturn("Hello from permissions service!");
+
     mockMvc
-        .perform(get("/hello/permissions"))
+        .perform(get("/hello/permissions").with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
         .andExpect(content().string("Hello from permissions service!"));
   }

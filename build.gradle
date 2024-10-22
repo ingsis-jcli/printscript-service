@@ -16,6 +16,21 @@ java {
     }
 }
 
+def loadEnv() {
+    def envFile = file(".env")
+    if (envFile.exists()) {
+        envFile.eachLine { line ->
+            def keyValue = line.split("=")
+            if (keyValue.length == 2) {
+                project.ext.set(keyValue[0], keyValue[1])
+            }
+        }
+    }
+}
+
+
+loadEnv()
+
 repositories {
     mavenLocal()
     mavenCentral()
@@ -23,8 +38,8 @@ repositories {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/JulietaG13/PrintScript")
         credentials {
-            username = System.getenv('USERNAME') ?: ''
-            password = System.getenv('TOKEN') ?: ''
+            username = System.getenv('USERNAME') ?: project.GITHUB_ACTOR
+            password = System.getenv('TOKEN') ?: project.GITHUB_TOKEN
         }
     }
 }
@@ -41,6 +56,14 @@ dependencies {
     implementation 'com.ingsis.jcli:runner:1.1.13'
     implementation 'com.ingsis.jcli:common:1.1.13'
     implementation 'com.google.code.gson:gson:2.8.9'
+
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+    // Auth0 Configuration
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 dependencyManagement {  // for openfeign
