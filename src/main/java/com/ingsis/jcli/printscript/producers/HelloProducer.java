@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component;
 public class HelloProducer extends JavaRedisStreamProducer {
 
   @Autowired
-  public HelloProducer(@Value("${stream.key}") String streamKey, RedisTemplate<String, String> redis) {
+  public HelloProducer(
+      @Value("${stream.key}") String streamKey, RedisTemplate<String, String> redis) {
     super(streamKey, redis);
   }
 
