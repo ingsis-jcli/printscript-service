@@ -1,5 +1,6 @@
 package com.ingsis.jcli.printscript.producers;
 
+import com.ingsis.jcli.printscript.consumers.HelloCreated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,6 +16,6 @@ public class HelloProducer extends JavaRedisStreamProducer {
   }
 
   public void produce(String name) {
-    emit("Hello, " + name + "!");
+    emit(new HelloCreated("Hello " + name + "!"));
   }
 }

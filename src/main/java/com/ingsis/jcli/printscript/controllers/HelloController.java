@@ -26,6 +26,11 @@ public class HelloController {
     return helloService.getHelloFromSnippetsServer();
   }
 
+  @GetMapping("/publish")
+  public void publishHello() {
+    helloService.publishHello();
+  }
+
   @GetMapping
   public String hello() {
     return helloService.getHello();
