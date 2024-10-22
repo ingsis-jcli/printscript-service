@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 public class HelloConsumer extends RedisStreamConsumer<HelloCreated> {
 
   public HelloConsumer(
-      @Value("${stream.key}") String streamKey,
-      @Value("${groups.product}") String groupId,
+      @Value("") String streamKey,
+      @Value("") String groupId,
       @NotNull RedisTemplate<String, String> redis) {
     super(streamKey, groupId, redis);
   }
