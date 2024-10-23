@@ -4,18 +4,22 @@ import com.ingsis.jcli.printscript.common.requests.AnalyzeRequest;
 import com.ingsis.jcli.printscript.common.requests.ExecuteRequest;
 import com.ingsis.jcli.printscript.common.requests.FormatRequest;
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
+import com.ingsis.jcli.printscript.common.responses.DefaultRules;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.digester.Rules;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -65,5 +69,23 @@ public class PrintScriptController {
   public ResponseEntity<String> execute(@RequestBody ExecuteRequest executeRequest) {
     String result = printScriptService.execute(executeRequest.snippet(), executeRequest.version());
     return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @GetMapping("/formatting_rules")
+  public ResponseEntity<DefaultRules> getFormattingRules(@RequestParam String version) {
+    Marker marker = MarkerFactory.getMarker("FormattingRules");
+    log.info(marker, "Fetching default formatting rules for version: " + version);
+
+    DefaultRules rules = printScriptService.getDefaultFormattingRules(version);
+    return new ResponseEntity<>(rules, HttpStatus.OK);
+  }
+
+  @GetMapping("/linting_rules")
+  public ResponseEntity<DefaultRules> getLintingRules(@RequestParam String version) {
+    Marker marker = MarkerFactory.getMarker("LintingRules");
+    log.info(marker, "Fetching default linting rules for version: " + version);
+
+    DefaultRules rules = printScriptService.getDefaultLintingRules(version);
+    return new ResponseEntity<>(rules, HttpStatus.OK);
   }
 }

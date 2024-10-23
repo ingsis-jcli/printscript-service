@@ -8,16 +8,21 @@ import com.google.gson.JsonObject;
 import com.ingsis.jcli.printscript.common.ConsoleResult;
 import com.ingsis.jcli.printscript.common.PrintAccumulator;
 import com.ingsis.jcli.printscript.common.UiInputProvider;
+import com.ingsis.jcli.printscript.common.responses.DefaultRule;
+import com.ingsis.jcli.printscript.common.responses.DefaultRules;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import edu.FormatterResult;
 import edu.Report;
 import edu.Runner;
+import edu.utils.DefaultRulesFactory;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.stereotype.Service;
+
 
 @Slf4j
 @Service
@@ -96,5 +101,27 @@ public class PrintScriptService {
       consoleResult.append(e.getMessage());
       return new ErrorResponse(consoleResult.getResult());
     }
+  }
+
+  public DefaultRules getDefaultFormattingRules(String version) {
+    DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
+    var defaultFormattingRules = rulesFactory.getDefaultFormattingRules();
+
+    List<DefaultRule> rules = defaultFormattingRules.entrySet().stream()
+        .map(rule -> new DefaultRule(rule.getKey(), true, rule.getValue().getAsString()))
+        .collect(Collectors.toList());
+
+    return new DefaultRules(rules);
+  }
+
+  public DefaultRules getDefaultLintingRules(String version) {
+    DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
+    var defaultLintingRules = rulesFactory.getDefaultLintingRules();
+
+    List<DefaultRule> rules = defaultLintingRules.entrySet().stream()
+        .map(entry -> new DefaultRule(entry.getKey(), true, entry.getValue().getAsString()))
+        .collect(Collectors.toList());
+
+    return new DefaultRules(rules);
   }
 }

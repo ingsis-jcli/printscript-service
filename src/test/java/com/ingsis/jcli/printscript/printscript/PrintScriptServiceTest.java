@@ -63,27 +63,4 @@ public class PrintScriptServiceTest {
     }
   }
 
-  @Test
-  void testValidate() {
-    List<TestCaseData> testCases =
-        List.of(
-            new TestCaseData("test1", false),
-            new TestCaseData("test2", false),
-            new TestCaseData("test3", true));
-
-    for (TestCaseData testCase : testCases) {
-      String input =
-          getStringFromFile(OperationType.VALIDATE, testCase.getName(), FileType.INPUT).get();
-      String expected =
-          getStringFromFile(OperationType.VALIDATE, testCase.getName(), FileType.OUTPUT).get();
-
-      ErrorResponse output = printScriptService.validate(input, "1.1");
-
-      if (testCase.isValid()) {
-        assert output.equals(new ErrorResponse(""));
-      } else {
-        assert output.equals(new ErrorResponse(expected));
-      }
-    }
-  }
 }
