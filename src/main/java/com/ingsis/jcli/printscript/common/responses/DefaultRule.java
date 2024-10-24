@@ -1,8 +1,5 @@
 package com.ingsis.jcli.printscript.common.responses;
 
-import lombok.Data;
-
-@Data
 public class DefaultRule {
   private String name;
 
