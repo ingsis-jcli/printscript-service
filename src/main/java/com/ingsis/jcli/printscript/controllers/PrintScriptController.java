@@ -85,6 +85,7 @@ public class PrintScriptController {
     log.info(marker, "Fetching default linting rules for version: " + version);
 
     DefaultRules rules = printScriptService.getDefaultLintingRules(version);
+    log.info(marker, "Rules: " + rules);
     return new ResponseEntity<>(rules, HttpStatus.OK);
   }
 }
