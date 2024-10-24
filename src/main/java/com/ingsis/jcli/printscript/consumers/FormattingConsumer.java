@@ -26,7 +26,7 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
 
   @Autowired
   public FormattingConsumer(
-      @Value("${formatting_stream.ke}") String streamKey,
+      @Value("${formatting_stream.key}") String streamKey,
       @Value("${formatting.groups.product}") String groupId,
       @NotNull RedisTemplate<String, String> redis,
       PrintScriptService printScriptService) {
