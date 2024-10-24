@@ -7,7 +7,6 @@ import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
 import com.ingsis.jcli.printscript.common.responses.DefaultRule;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
-
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,8 @@ public class PrintScriptController {
     log.info(marker, "ValidateRequest received: " + validateRequest);
 
     ErrorResponse response =
-        printScriptService.validate(validateRequest.snippet(), validateRequest.version());
+        printScriptService.validate(
+            validateRequest.name(), validateRequest.url(), validateRequest.version());
     log.info(marker, "printscript response: \"" + response + "\"");
 
     if (Objects.equals(response.error(), "")) {
@@ -54,7 +54,10 @@ public class PrintScriptController {
   public ResponseEntity<String> format(@RequestBody FormatRequest formatRequest) {
     String formattedSnippet =
         printScriptService.format(
-            formatRequest.snippet(), formatRequest.config(), formatRequest.version());
+            formatRequest.name(),
+            formatRequest.url(),
+            formatRequest.rules(),
+            formatRequest.version());
     return new ResponseEntity<>(formattedSnippet, HttpStatus.OK);
   }
 
@@ -62,13 +65,18 @@ public class PrintScriptController {
   public ResponseEntity<String> analyze(@RequestBody AnalyzeRequest analyzeRequest) {
     String report =
         printScriptService.analyze(
-            analyzeRequest.snippet(), analyzeRequest.config(), analyzeRequest.version());
+            analyzeRequest.name(),
+            analyzeRequest.url(),
+            analyzeRequest.rules(),
+            analyzeRequest.version());
     return new ResponseEntity<>(report, HttpStatus.OK);
   }
 
   @PostMapping("/execute")
   public ResponseEntity<String> execute(@RequestBody ExecuteRequest executeRequest) {
-    String result = printScriptService.execute(executeRequest.snippet(), executeRequest.version());
+    String result =
+        printScriptService.execute(
+            executeRequest.name(), executeRequest.url(), executeRequest.version());
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 

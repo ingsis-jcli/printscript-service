@@ -1,6 +1,5 @@
 package com.ingsis.jcli.printscript.services;
 
-import static com.ingsis.jcli.printscript.common.PrintScriptUtil.getInputStreamFromString;
 import static com.ingsis.jcli.printscript.common.PrintScriptUtil.getJsonRules;
 import static com.ingsis.jcli.printscript.common.PrintScriptUtil.reportToString;
 
@@ -8,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.ingsis.jcli.printscript.common.ConsoleResult;
 import com.ingsis.jcli.printscript.common.PrintAccumulator;
 import com.ingsis.jcli.printscript.common.UiInputProvider;
+import com.ingsis.jcli.printscript.common.requests.Rule;
 import com.ingsis.jcli.printscript.common.responses.DefaultRule;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import edu.FormatterResult;
@@ -20,19 +20,23 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class PrintScriptService {
   private final List<String> availableVersions;
+  private final SnippetsService snippetsService;
 
-  public PrintScriptService() {
+  @Autowired
+  public PrintScriptService(SnippetsService snippetsService) {
     this.availableVersions = List.of("1.0", "1.1");
+    this.snippetsService = snippetsService;
   }
 
-  public String format(String snippet, String config, String version) {
-    InputStream code = getInputStreamFromString(snippet);
+  public String format(String name, String url, List<Rule> config, String version) {
+    InputStream code = snippetsService.getSnippetStream(name, url);
     JsonObject rules = getJsonRules(config);
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);
@@ -42,19 +46,19 @@ public class PrintScriptService {
     return result.getResult();
   }
 
-  public String analyze(String snippet, String config, String version) {
-    InputStream code = getInputStreamFromString(snippet);
-    JsonObject rules = getJsonRules(config);
+  public String analyze(String name, String url, List<Rule> rules, String version) {
+    JsonObject rulesJson = getJsonRules(rules);
+    InputStream code = snippetsService.getSnippetStream(name, url);
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);
     }
     Runner runner = new Runner(version);
-    Report result = runner.analyze(code, rules);
+    Report result = runner.analyze(code, rulesJson);
     return reportToString(result);
   }
 
-  public String execute(String snippet, String version) {
-    InputStream code = getInputStreamFromString(snippet);
+  public String execute(String name, String url, String version) {
+    InputStream code = snippetsService.getSnippetStream(name, url);
     ConsoleResult consoleResult = new ConsoleResult();
     PrintAccumulator printAccumulator = new PrintAccumulator(consoleResult);
     UiInputProvider uiInputProvider = new UiInputProvider(printAccumulator);
@@ -71,11 +75,11 @@ public class PrintScriptService {
     }
   }
 
-  public ErrorResponse validate(String snippet, String version) {
+  public ErrorResponse validate(String name, String url, String version) {
     Marker marker = MarkerFactory.getMarker("Validate");
-    log.info(marker, "Validating snippet: " + snippet);
-
-    InputStream code = getInputStreamFromString(snippet);
+    log.info(marker, "Looking for snippet with name: " + name);
+    log.info(marker, "Looking for snippet at container: " + url);
+    InputStream code = snippetsService.getSnippetStream(name, url);
     ConsoleResult consoleResult = new ConsoleResult();
 
     if (!availableVersions.contains(version)) {
@@ -88,7 +92,7 @@ public class PrintScriptService {
 
     try {
       runner.validate(code);
-      log.info(marker, "Validated snippet: " + snippet);
+      log.info(marker, "Validated snippet: " + name);
 
       if (consoleResult.getResult() == null || consoleResult.getResult().isBlank()) {
         return new ErrorResponse("");

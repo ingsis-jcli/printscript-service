@@ -1,8 +1,8 @@
-package com.ingsis.jcli.printscript.common.responses;
+package com.ingsis.jcli.printscript.common.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record DefaultRule(
-    @JsonProperty("name") String name,
+public record Rule(
     @JsonProperty("isActive") boolean isActive,
+    @JsonProperty("name") String name,
     @JsonProperty("value") String value) {}

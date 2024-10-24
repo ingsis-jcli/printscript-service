@@ -1,5 +1,6 @@
 package com.ingsis.jcli.printscript.consumers;
 
+import com.ingsis.jcli.printscript.consumers.requests.PendingSnippetLint;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Profile("!test")
 @Slf4j
 @Component
-public class LintingConsumer extends RedisStreamConsumer<String> {
+public class LintingConsumer extends RedisStreamConsumer<PendingSnippetLint> {
 
   private final PrintScriptService printScriptService;
 
@@ -32,39 +33,26 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
 
   @NotNull
   @Override
-  protected StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, String>> options() {
+  protected StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, PendingSnippetLint>>
+      options() {
     return StreamReceiver.StreamReceiverOptions.builder()
         .pollTimeout(Duration.ofMillis(10000))
-        .targetType(String.class)
+        .targetType(PendingSnippetLint.class)
         .build();
   }
 
   @Override
-  protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
-    String message = objectRecord.getValue();
-    log.info("Processing snippet message: " + message);
-    System.out.println("Processing snippet: " + message);
-
-    //    LintRequest lintRequest = deserializeLintRequest(message);
-    //    SnippetDto snippet = lintRequest.snippetDto();
-    //    List<Rule> rules = lintRequest.ruleList();
-    //
-    //    String rulesConfig = convertRulesToConfig(rules);
-    //    String result = printScriptService.analyze(snippet.getContent(), rulesConfig,
-    // snippet.getVersion());
-    //
-    //    log.info("Linting result for snippet " + snippet.getName() + ": " + result);
+  protected void onMessage(@NotNull ObjectRecord<String, PendingSnippetLint> objectRecord) {
+    PendingSnippetLint snippetLint = objectRecord.getValue();
+    log.info("Processing snippet message: ");
+    System.out.println(
+        "Processing snippet: "
+            + snippetLint.name()
+            + " at "
+            + snippetLint.url()
+            + " with rules: "
+            + snippetLint.rules());
+    printScriptService.analyze(
+        snippetLint.name(), snippetLint.url(), snippetLint.rules(), snippetLint.version());
   }
-
-  //  private LintRequest deserializeLintRequest(String message) {
-  //    return new Gson().fromJson(message, LintRequest.class);
-  //  }
-  //
-  //  private String convertRulesToConfig(List<Rule> rules) {
-  //    JsonObject rulesJson = new JsonObject();
-  //    for (Rule rule : rules) {
-  //      rulesJson.addProperty(rule.getName(), rule.getValue());
-  //    }
-  //    return rulesJson.toString();
-  //  }
 }

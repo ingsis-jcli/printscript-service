@@ -1,7 +1,7 @@
 package com.ingsis.jcli.printscript.common;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.ingsis.jcli.printscript.common.requests.Rule;
 import edu.Report;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -13,8 +13,14 @@ public class PrintScriptUtil {
     return new ByteArrayInputStream(snippet.getBytes());
   }
 
-  public static JsonObject getJsonRules(String config) {
-    return JsonParser.parseString(config).getAsJsonObject();
+  public static JsonObject getJsonRules(List<Rule> rules) {
+    JsonObject jsonObject = new JsonObject();
+    for (Rule rule : rules) {
+      if (rule.isActive()) {
+        jsonObject.addProperty(rule.name(), rule.value());
+      }
+    }
+    return jsonObject;
   }
 
   public static String reportToString(Report report) {

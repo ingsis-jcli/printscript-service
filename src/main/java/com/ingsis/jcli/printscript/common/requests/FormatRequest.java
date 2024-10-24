@@ -1,3 +1,5 @@
 package com.ingsis.jcli.printscript.common.requests;
 
-public record FormatRequest(String snippet, String config, String version) {}
+import java.util.List;
+
+public record FormatRequest(String name, String url, List<Rule> rules, String version) {}
