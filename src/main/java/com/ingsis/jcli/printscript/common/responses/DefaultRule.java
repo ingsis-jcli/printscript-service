@@ -1,15 +1,8 @@
 package com.ingsis.jcli.printscript.common.responses;
 
-public class DefaultRule {
-  private String name;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-  private boolean isActive;
-
-  private String value;
-
-  public DefaultRule(String name, boolean isActive, String value) {
-    this.name = name;
-    this.isActive = isActive;
-    this.value = value;
-  }
-}
+public record DefaultRule(
+  @JsonProperty("name") String name,
+  @JsonProperty("isActive") boolean isActive,
+  @JsonProperty("value") String value) {}

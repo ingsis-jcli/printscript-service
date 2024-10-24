@@ -9,7 +9,6 @@ import com.ingsis.jcli.printscript.common.ConsoleResult;
 import com.ingsis.jcli.printscript.common.PrintAccumulator;
 import com.ingsis.jcli.printscript.common.UiInputProvider;
 import com.ingsis.jcli.printscript.common.responses.DefaultRule;
-import com.ingsis.jcli.printscript.common.responses.DefaultRules;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import edu.FormatterResult;
 import edu.Report;
@@ -102,7 +101,7 @@ public class PrintScriptService {
     }
   }
 
-  public DefaultRules getDefaultFormattingRules(String version) {
+  public List<DefaultRule> getDefaultFormattingRules(String version) {
     DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
     var defaultFormattingRules = rulesFactory.getDefaultFormattingRules();
 
@@ -111,10 +110,10 @@ public class PrintScriptService {
             .map(rule -> new DefaultRule(rule.getKey(), true, rule.getValue().getAsString()))
             .collect(Collectors.toList());
 
-    return new DefaultRules(rules);
+    return rules;
   }
 
-  public DefaultRules getDefaultLintingRules(String version) {
+  public List<DefaultRule> getDefaultLintingRules(String version) {
     DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
     var defaultLintingRules = rulesFactory.getDefaultLintingRules();
 
@@ -123,6 +122,6 @@ public class PrintScriptService {
             .map(entry -> new DefaultRule(entry.getKey(), true, entry.getValue().getAsString()))
             .collect(Collectors.toList());
 
-    return new DefaultRules(rules);
+    return rules;
   }
 }

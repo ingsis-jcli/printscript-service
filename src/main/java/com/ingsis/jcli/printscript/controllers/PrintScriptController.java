@@ -4,9 +4,11 @@ import com.ingsis.jcli.printscript.common.requests.AnalyzeRequest;
 import com.ingsis.jcli.printscript.common.requests.ExecuteRequest;
 import com.ingsis.jcli.printscript.common.requests.FormatRequest;
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
-import com.ingsis.jcli.printscript.common.responses.DefaultRules;
+import com.ingsis.jcli.printscript.common.responses.DefaultRule;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
+
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
@@ -71,20 +73,20 @@ public class PrintScriptController {
   }
 
   @GetMapping("/formatting_rules")
-  public ResponseEntity<DefaultRules> getFormattingRules(@RequestParam String version) {
+  public ResponseEntity<List<DefaultRule>> getFormattingRules(@RequestParam String version) {
     Marker marker = MarkerFactory.getMarker("FormattingRules");
     log.info(marker, "Fetching default formatting rules for version: " + version);
 
-    DefaultRules rules = printScriptService.getDefaultFormattingRules(version);
+    List<DefaultRule> rules = printScriptService.getDefaultFormattingRules(version);
     return new ResponseEntity<>(rules, HttpStatus.OK);
   }
 
   @GetMapping("/linting_rules")
-  public ResponseEntity<DefaultRules> getLintingRules(@RequestParam String version) {
+  public ResponseEntity<List<DefaultRule>> getLintingRules(@RequestParam String version) {
     Marker marker = MarkerFactory.getMarker("LintingRules");
     log.info(marker, "Fetching default linting rules for version: " + version);
 
-    DefaultRules rules = printScriptService.getDefaultLintingRules(version);
+    List<DefaultRule> rules = printScriptService.getDefaultLintingRules(version);
     log.info(marker, "Rules: " + rules);
     return new ResponseEntity<>(rules, HttpStatus.OK);
   }
