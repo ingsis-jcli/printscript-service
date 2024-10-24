@@ -1,6 +1,5 @@
 package com.ingsis.jcli.printscript.consumers;
 
-
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -46,26 +45,26 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
     log.info("Processing snippet message: " + message);
     System.out.println("Processing snippet: " + message);
 
-//    LintRequest lintRequest = deserializeLintRequest(message);
-//    SnippetDto snippet = lintRequest.snippetDto();
-//    List<Rule> rules = lintRequest.ruleList();
-//
-//    String rulesConfig = convertRulesToConfig(rules);
-//    String result = printScriptService.analyze(snippet.getContent(), rulesConfig, snippet.getVersion());
-//
-//    log.info("Linting result for snippet " + snippet.getName() + ": " + result);
+    //    LintRequest lintRequest = deserializeLintRequest(message);
+    //    SnippetDto snippet = lintRequest.snippetDto();
+    //    List<Rule> rules = lintRequest.ruleList();
+    //
+    //    String rulesConfig = convertRulesToConfig(rules);
+    //    String result = printScriptService.analyze(snippet.getContent(), rulesConfig,
+    // snippet.getVersion());
+    //
+    //    log.info("Linting result for snippet " + snippet.getName() + ": " + result);
   }
 
-//  private LintRequest deserializeLintRequest(String message) {
-//    return new Gson().fromJson(message, LintRequest.class);
-//  }
-//
-//  private String convertRulesToConfig(List<Rule> rules) {
-//    JsonObject rulesJson = new JsonObject();
-//    for (Rule rule : rules) {
-//      rulesJson.addProperty(rule.getName(), rule.getValue());
-//    }
-//    return rulesJson.toString();
-//  }
+  //  private LintRequest deserializeLintRequest(String message) {
+  //    return new Gson().fromJson(message, LintRequest.class);
+  //  }
+  //
+  //  private String convertRulesToConfig(List<Rule> rules) {
+  //    JsonObject rulesJson = new JsonObject();
+  //    for (Rule rule : rules) {
+  //      rulesJson.addProperty(rule.getName(), rule.getValue());
+  //    }
+  //    return rulesJson.toString();
+  //  }
 }
-

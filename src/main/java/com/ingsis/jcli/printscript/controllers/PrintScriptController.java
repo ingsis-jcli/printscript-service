@@ -9,7 +9,6 @@ import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.digester.Rules;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/printscript")
+@RequestMapping()
 public class PrintScriptController {
 
   final PrintScriptService printScriptService;

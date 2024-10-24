@@ -50,7 +50,7 @@ public class PrintScriptControllerTest {
 
     mockMvc
         .perform(
-            post("/printscript/format")
+            post("/format")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(req))
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -70,7 +70,7 @@ public class PrintScriptControllerTest {
 
     mockMvc
         .perform(
-            post("/printscript/analyze")
+            post("/analyze")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(req))
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -89,7 +89,7 @@ public class PrintScriptControllerTest {
 
     mockMvc
         .perform(
-            post("/printscript/execute")
+            post("/execute")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(req))
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -119,7 +119,7 @@ public class PrintScriptControllerTest {
       if (testCase.isValid()) {
         mockMvc
             .perform(
-                post("/printscript/validate")
+                post("/validate")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(req))
                     .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -127,7 +127,7 @@ public class PrintScriptControllerTest {
       } else {
         mockMvc
             .perform(
-                post("/printscript/validate")
+                post("/validate")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(req))
                     .with(SecurityMockMvcRequestPostProcessors.jwt()))

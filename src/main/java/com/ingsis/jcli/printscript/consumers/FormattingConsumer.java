@@ -1,12 +1,8 @@
 package com.ingsis.jcli.printscript.consumers;
 
-
-import com.ingsis.jcli.printscript.common.requests.FormatRequest;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.digester.Rule;
 import org.austral.ingsis.redis.RedisStreamConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,25 +44,25 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
     String snippetId = objectRecord.getValue();
     log.info("Processing snippet: " + snippetId);
     System.out.println("Processing snippet: " + snippetId);
-//    FormatRequest formatRequest = deserializeFormatRequest(objectRecord.getValue());
-//    SnippetDto snippet = formatRequest.snippetDto();
-//    List<Rule> rules = formatRequest.ruleList();
-//
-//    String rulesConfig = convertRulesToConfig(rules);
-//    String result = printScriptService.format(snippet.getContent(), rulesConfig, snippet.getVersion());
-//    log.info("Format result for snippet " + snippetId + ": " + result);
+    //    FormatRequest formatRequest = deserializeFormatRequest(objectRecord.getValue());
+    //    SnippetDto snippet = formatRequest.snippetDto();
+    //    List<Rule> rules = formatRequest.ruleList();
+    //
+    //    String rulesConfig = convertRulesToConfig(rules);
+    //    String result = printScriptService.format(snippet.getContent(), rulesConfig,
+    // snippet.getVersion());
+    //    log.info("Format result for snippet " + snippetId + ": " + result);
   }
 
-//  private String convertRulesToConfig(List<Rule> rules) {
-//    JsonObject rulesJson = new JsonObject();
-//    for (Rule rule : rules) {
-//      rulesJson.addProperty(rule.getName(), rule.getValue());
-//    }
-//    return rulesJson.toString();
-//  }
+  //  private String convertRulesToConfig(List<Rule> rules) {
+  //    JsonObject rulesJson = new JsonObject();
+  //    for (Rule rule : rules) {
+  //      rulesJson.addProperty(rule.getName(), rule.getValue());
+  //    }
+  //    return rulesJson.toString();
+  //  }
 
-//  private FormatRequest deserializeFormatRequest(String message) {
-//    return new Gson().fromJson(message, FormatRequest.class);
-//  }
+  //  private FormatRequest deserializeFormatRequest(String message) {
+  //    return new Gson().fromJson(message, FormatRequest.class);
+  //  }
 }
-

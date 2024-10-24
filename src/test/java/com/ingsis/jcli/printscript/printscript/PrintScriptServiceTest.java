@@ -6,8 +6,6 @@ import com.ingsis.jcli.printscript.clients.PermissionsClient;
 import com.ingsis.jcli.printscript.clients.SnippetsClient;
 import com.ingsis.jcli.printscript.common.FileType;
 import com.ingsis.jcli.printscript.common.OperationType;
-import com.ingsis.jcli.printscript.common.TestCaseData;
-import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.util.List;
 import java.util.Optional;
@@ -62,5 +60,4 @@ public class PrintScriptServiceTest {
       assert output.equals(expected.get());
     }
   }
-
 }

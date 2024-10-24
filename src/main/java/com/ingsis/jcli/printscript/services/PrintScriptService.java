@@ -23,7 +23,6 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.stereotype.Service;
 
-
 @Slf4j
 @Service
 public class PrintScriptService {
@@ -107,9 +106,10 @@ public class PrintScriptService {
     DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
     var defaultFormattingRules = rulesFactory.getDefaultFormattingRules();
 
-    List<DefaultRule> rules = defaultFormattingRules.entrySet().stream()
-        .map(rule -> new DefaultRule(rule.getKey(), true, rule.getValue().getAsString()))
-        .collect(Collectors.toList());
+    List<DefaultRule> rules =
+        defaultFormattingRules.entrySet().stream()
+            .map(rule -> new DefaultRule(rule.getKey(), true, rule.getValue().getAsString()))
+            .collect(Collectors.toList());
 
     return new DefaultRules(rules);
   }
@@ -118,9 +118,10 @@ public class PrintScriptService {
     DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
     var defaultLintingRules = rulesFactory.getDefaultLintingRules();
 
-    List<DefaultRule> rules = defaultLintingRules.entrySet().stream()
-        .map(entry -> new DefaultRule(entry.getKey(), true, entry.getValue().getAsString()))
-        .collect(Collectors.toList());
+    List<DefaultRule> rules =
+        defaultLintingRules.entrySet().stream()
+            .map(entry -> new DefaultRule(entry.getKey(), true, entry.getValue().getAsString()))
+            .collect(Collectors.toList());
 
     return new DefaultRules(rules);
   }

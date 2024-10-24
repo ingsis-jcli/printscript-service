@@ -17,5 +17,4 @@ public class HelloProducer extends JavaRedisStreamProducer {
   public void produce(String name) {
     emit("Hello " + name + "!");
   }
-
 }
