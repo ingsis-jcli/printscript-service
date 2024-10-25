@@ -49,12 +49,10 @@ public class PrintScriptController {
 
     log.info(marker, "printscript response: \"" + response + "\"");
 
-    // Check if the response is null or empty
     if (Objects.equals(response.error(), "")) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(new ErrorResponse(""), HttpStatus.OK);
     }
-    return new ResponseEntity<>(
-        response, HttpStatus.BAD_REQUEST); // Ensure this returns the error response as JSON
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 
   @PostMapping("/format")
