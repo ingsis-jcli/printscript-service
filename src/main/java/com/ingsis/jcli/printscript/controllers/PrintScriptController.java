@@ -34,7 +34,7 @@ public class PrintScriptController {
     this.printScriptService = printScriptService;
   }
 
-  @PostMapping(value = "/validate", consumes = "application/json")
+  @PostMapping(value = "/validate")
   public ResponseEntity<ErrorResponse> validate(@RequestBody ValidateRequest validateRequest) {
     Marker marker = MarkerFactory.getMarker("Validate");
     log.info(marker, "ValidateRequest received: " + validateRequest);
