@@ -14,6 +14,7 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +35,10 @@ public class PrintScriptController {
     this.printScriptService = printScriptService;
   }
 
-  @PostMapping(value = "/validate")
+  @PostMapping(
+      value = "/validate",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ErrorResponse> validate(@RequestBody ValidateRequest validateRequest) {
     Marker marker = MarkerFactory.getMarker("Validate");
     log.info(marker, "ValidateRequest received: " + validateRequest);
@@ -42,12 +46,15 @@ public class PrintScriptController {
     ErrorResponse response =
         printScriptService.validate(
             validateRequest.name(), validateRequest.url(), validateRequest.version());
+
     log.info(marker, "printscript response: \"" + response + "\"");
 
+    // Check if the response is null or empty
     if (Objects.equals(response.error(), "")) {
       return new ResponseEntity<>(HttpStatus.OK);
     }
-    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // TODO: custom status code?
+    return new ResponseEntity<>(
+        response, HttpStatus.BAD_REQUEST); // Ensure this returns the error response as JSON
   }
 
   @PostMapping("/format")
