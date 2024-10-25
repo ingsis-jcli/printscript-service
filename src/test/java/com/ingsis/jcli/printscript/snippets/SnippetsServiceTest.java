@@ -8,9 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
-import com.ingsis.jcli.printscript.clients.BucketClient;
+import com.ingsis.jcli.printscript.clients.BucketRestClient;
+import com.ingsis.jcli.printscript.clients.factories.BucketRestTemplateFactory;
 import com.ingsis.jcli.printscript.common.exceptions.SnippetNotFoundException;
 import com.ingsis.jcli.printscript.services.SnippetsService;
 import java.io.InputStream;
@@ -19,18 +20,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 class SnippetsServiceTest {
 
-  @Mock private BucketClient bucketClient;
+  @Mock private BucketRestClient bucketRestClient;
+  @Mock private BucketRestTemplateFactory bucketRestTemplateFactory;
 
   @InjectMocks private SnippetsService snippetsService;
 
   @BeforeEach
   void setUp() {
-    initMocks(this);
+    openMocks(this);
+    when(bucketRestTemplateFactory.createClient()).thenReturn(bucketRestClient);
+
+    snippetsService = new SnippetsService(bucketRestTemplateFactory);
   }
 
   @Test
@@ -39,14 +42,12 @@ class SnippetsServiceTest {
     String container = "testContainer";
     String expectedContent = "print('Hello World');";
 
-    when(bucketClient.getSnippet(name, container))
-        .thenReturn(new ResponseEntity<>(expectedContent, HttpStatus.OK));
-
+    when(bucketRestClient.getSnippet(name, container)).thenReturn(expectedContent);
     Optional<String> result = snippetsService.getSnippet(name, container);
 
     assertTrue(result.isPresent(), "Expected snippet content to be present");
     assertEquals(expectedContent, result.get(), "Expected snippet content to match");
-    verify(bucketClient, times(1)).getSnippet(name, container);
+    verify(bucketRestClient, times(1)).getSnippet(name, container);
   }
 
   @Test
@@ -54,13 +55,11 @@ class SnippetsServiceTest {
     String name = "missingSnippet";
     String container = "testContainer";
 
-    when(bucketClient.getSnippet(name, container))
-        .thenReturn(new ResponseEntity<>(null, HttpStatus.NO_CONTENT));
-
+    when(bucketRestClient.getSnippet(name, container)).thenReturn(null);
     Optional<String> result = snippetsService.getSnippet(name, container);
 
     assertFalse(result.isPresent(), "Expected snippet content to be empty");
-    verify(bucketClient, times(1)).getSnippet(name, container);
+    verify(bucketRestClient, times(1)).getSnippet(name, container);
   }
 
   @Test
@@ -69,13 +68,11 @@ class SnippetsServiceTest {
     String container = "testContainer";
     String snippetContent = "print('Hello World');";
 
-    when(bucketClient.getSnippet(name, container))
-        .thenReturn(new ResponseEntity<>(snippetContent, HttpStatus.OK));
-
+    when(bucketRestClient.getSnippet(name, container)).thenReturn(snippetContent);
     InputStream result = snippetsService.getSnippetStream(name, container);
 
     assertNotNull(result, "Expected InputStream to be non-null");
-    verify(bucketClient, times(1)).getSnippet(name, container);
+    verify(bucketRestClient, times(1)).getSnippet(name, container);
   }
 
   @Test
@@ -83,8 +80,7 @@ class SnippetsServiceTest {
     String name = "missingSnippet";
     String container = "testContainer";
 
-    when(bucketClient.getSnippet(name, container))
-        .thenReturn(new ResponseEntity<>(null, HttpStatus.NO_CONTENT));
+    when(bucketRestClient.getSnippet(name, container)).thenReturn(null);
 
     SnippetNotFoundException exception =
         assertThrows(
@@ -94,6 +90,6 @@ class SnippetsServiceTest {
 
     assertEquals(
         exception.getMessage(), "Snippet names: " + name + " at " + container + " not found!");
-    verify(bucketClient, times(1)).getSnippet(name, container);
+    verify(bucketRestClient, times(1)).getSnippet(name, container);
   }
 }

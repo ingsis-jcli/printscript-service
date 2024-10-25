@@ -2,29 +2,26 @@ package com.ingsis.jcli.printscript.services;
 
 import static com.ingsis.jcli.printscript.common.PrintScriptUtil.getInputStreamFromString;
 
-import com.ingsis.jcli.printscript.clients.BucketClient;
+import com.ingsis.jcli.printscript.clients.BucketRestClient;
+import com.ingsis.jcli.printscript.clients.factories.BucketRestTemplateFactory;
 import com.ingsis.jcli.printscript.common.exceptions.SnippetNotFoundException;
 import java.io.InputStream;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SnippetsService {
-  private final BucketClient bucketClient;
+  private final BucketRestClient bucketClient;
 
   @Autowired
-  public SnippetsService(BucketClient bucketClient) {
-    this.bucketClient = bucketClient;
+  public SnippetsService(BucketRestTemplateFactory bucketRestTemplateFactory) {
+    this.bucketClient = bucketRestTemplateFactory.createClient();
   }
 
   public Optional<String> getSnippet(String name, String container) {
-    ResponseEntity<String> response = bucketClient.getSnippet(name, container);
-    if (response.hasBody()) {
-      return Optional.of(response.getBody());
-    }
-    return Optional.empty();
+    String snippet = bucketClient.getSnippet(name, container);
+    return Optional.ofNullable(snippet);
   }
 
   public InputStream getSnippetStream(String name, String container) {
