@@ -1,7 +1,7 @@
 package com.ingsis.jcli.printscript.common;
 
 import com.google.gson.JsonObject;
-import com.ingsis.jcli.printscript.common.requests.Rule;
+import com.ingsis.jcli.printscript.common.requests.RuleDto;
 import edu.Report;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -13,9 +13,9 @@ public class PrintScriptUtil {
     return new ByteArrayInputStream(snippet.getBytes());
   }
 
-  public static JsonObject getJsonRules(List<Rule> rules) {
+  public static JsonObject getJsonRules(List<RuleDto> rules) {
     JsonObject jsonObject = new JsonObject();
-    for (Rule rule : rules) {
+    for (RuleDto rule : rules) {
       if (rule.isActive()) {
         jsonObject.addProperty(rule.name(), rule.value());
       }

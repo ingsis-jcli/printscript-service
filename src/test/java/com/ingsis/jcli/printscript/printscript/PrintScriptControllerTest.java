@@ -14,7 +14,7 @@ import com.ingsis.jcli.printscript.common.TestCaseData;
 import com.ingsis.jcli.printscript.common.requests.AnalyzeRequest;
 import com.ingsis.jcli.printscript.common.requests.ExecuteRequest;
 import com.ingsis.jcli.printscript.common.requests.FormatRequest;
-import com.ingsis.jcli.printscript.common.requests.Rule;
+import com.ingsis.jcli.printscript.common.requests.RuleDto;
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.controllers.PrintScriptController;
@@ -47,13 +47,13 @@ public class PrintScriptControllerTest {
   void testFormat() throws Exception {
     String url = "/format";
     String name = "test1";
-    List<Rule> rules =
+    List<RuleDto> rules =
         List.of(
-            new Rule(true, "declaration_space_before_colon", "true"),
-            new Rule(true, "declaration_space_after_colon", "true"),
-            new Rule(true, "declaration_space_before_equals", "true"),
-            new Rule(true, "declaration_space_after_equals", "true"),
-            new Rule(true, "println_new_lines_before_call", "0"));
+            new RuleDto(true, "declaration_space_before_colon", "true"),
+            new RuleDto(true, "declaration_space_after_colon", "true"),
+            new RuleDto(true, "declaration_space_before_equals", "true"),
+            new RuleDto(true, "declaration_space_after_equals", "true"),
+            new RuleDto(true, "println_new_lines_before_call", "0"));
     String input = getStringFromFile(OperationType.FORMAT, name, FileType.INPUT).get();
     String expected = getStringFromFile(OperationType.FORMAT, name, FileType.OUTPUT).get();
 
@@ -78,7 +78,7 @@ public class PrintScriptControllerTest {
     String name = "test1";
     String input = getStringFromFile(OperationType.ANALYZE, name, FileType.INPUT).get();
     String expected = getStringFromFile(OperationType.ANALYZE, name, FileType.OUTPUT).get();
-    List<Rule> rules = List.of();
+    List<RuleDto> rules = List.of();
 
     when(printScriptService.analyze(name, url, rules, "1.1")).thenReturn(expected);
     when(snippetsService.getSnippetStream(name, url)).thenReturn(getInputStreamFromString(input));

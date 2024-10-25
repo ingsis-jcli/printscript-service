@@ -7,8 +7,7 @@ import com.google.gson.JsonObject;
 import com.ingsis.jcli.printscript.common.ConsoleResult;
 import com.ingsis.jcli.printscript.common.PrintAccumulator;
 import com.ingsis.jcli.printscript.common.UiInputProvider;
-import com.ingsis.jcli.printscript.common.requests.Rule;
-import com.ingsis.jcli.printscript.common.responses.DefaultRule;
+import com.ingsis.jcli.printscript.common.requests.RuleDto;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import edu.FormatterResult;
 import edu.Report;
@@ -35,7 +34,7 @@ public class PrintScriptService {
     this.snippetsService = snippetsService;
   }
 
-  public String format(String name, String url, List<Rule> config, String version) {
+  public String format(String name, String url, List<RuleDto> config, String version) {
     InputStream code = snippetsService.getSnippetStream(name, url);
     JsonObject rules = getJsonRules(config);
     if (!availableVersions.contains(version)) {
@@ -46,7 +45,7 @@ public class PrintScriptService {
     return result.getResult();
   }
 
-  public String analyze(String name, String url, List<Rule> rules, String version) {
+  public String analyze(String name, String url, List<RuleDto> rules, String version) {
     JsonObject rulesJson = getJsonRules(rules);
     InputStream code = snippetsService.getSnippetStream(name, url);
     if (!availableVersions.contains(version)) {
@@ -105,25 +104,25 @@ public class PrintScriptService {
     }
   }
 
-  public List<DefaultRule> getDefaultFormattingRules(String version) {
+  public List<RuleDto> getDefaultFormattingRules(String version) {
     DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
     var defaultFormattingRules = rulesFactory.getDefaultFormattingRules();
 
-    List<DefaultRule> rules =
+    List<RuleDto> rules =
         defaultFormattingRules.entrySet().stream()
-            .map(rule -> new DefaultRule(rule.getKey(), true, rule.getValue().getAsString()))
+            .map(rule -> new RuleDto(false, rule.getKey(), rule.getValue().getAsString()))
             .collect(Collectors.toList());
 
     return rules;
   }
 
-  public List<DefaultRule> getDefaultLintingRules(String version) {
+  public List<RuleDto> getDefaultLintingRules(String version) {
     DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
     var defaultLintingRules = rulesFactory.getDefaultLintingRules();
 
-    List<DefaultRule> rules =
+    List<RuleDto> rules =
         defaultLintingRules.entrySet().stream()
-            .map(entry -> new DefaultRule(entry.getKey(), true, entry.getValue().getAsString()))
+            .map(entry -> new RuleDto(false, entry.getKey(), entry.getValue().getAsString()))
             .collect(Collectors.toList());
 
     return rules;
