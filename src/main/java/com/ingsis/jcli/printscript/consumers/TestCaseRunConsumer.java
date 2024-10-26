@@ -46,6 +46,10 @@ public class TestCaseRunConsumer extends RedisStreamConsumer<PendingTestCaseProd
   @Override
   protected void onMessage(@NotNull ObjectRecord<String, PendingTestCaseProduct> objectRecord) {
     PendingTestCaseProduct testCase = objectRecord.getValue();
+    if (testCase == null) {
+      log.error("Received null testCase, check the serialization and JSON structure");
+      return;
+    }
     log.info("Running test case with id: " + testCase.id());
 
     TestType type =
