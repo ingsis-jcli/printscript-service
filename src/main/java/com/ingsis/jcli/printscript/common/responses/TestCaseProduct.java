@@ -10,4 +10,5 @@ public class TestCaseProduct {
   private String url;
   private List<String> input;
   private List<String> output;
+  private String version;
 }
