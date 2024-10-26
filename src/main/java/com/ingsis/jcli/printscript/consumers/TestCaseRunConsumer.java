@@ -1,5 +1,6 @@
 package com.ingsis.jcli.printscript.consumers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.consumers.requests.PendingTestCaseRun;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
@@ -9,9 +10,13 @@ import org.austral.ingsis.redis.RedisStreamConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.stream.StreamReceiver;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +27,20 @@ public class TestCaseRunConsumer extends RedisStreamConsumer<PendingTestCaseRun>
 
   private final PrintScriptService printScriptService;
 
+  @Bean
+  public RedisTemplate<String, Object> redisTemplate(
+      RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
+    RedisTemplate<String, Object> template = new RedisTemplate<>();
+    template.setConnectionFactory(connectionFactory);
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
+    return template;
+  }
+
   @Autowired
   public TestCaseRunConsumer(
       @Value("${test_case_stream.key}") String streamKey,
-      @Value("${test_case.groups.product}") String groupId,
+      @Value("${linting.groups.product}") String groupId,
       @NotNull RedisTemplate<String, String> redis,
       PrintScriptService printScriptService) {
     super(streamKey, groupId, redis);
