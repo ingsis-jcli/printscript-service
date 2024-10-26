@@ -1,4 +1,4 @@
-package com.ingsis.jcli.printscript.common;
+package com.ingsis.jcli.printscript.utils;
 
 import com.google.gson.JsonObject;
 import com.ingsis.jcli.printscript.common.requests.RuleDto;

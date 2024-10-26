@@ -1,14 +1,17 @@
 package com.ingsis.jcli.printscript.services;
 
-import static com.ingsis.jcli.printscript.common.PrintScriptUtil.getJsonRules;
-import static com.ingsis.jcli.printscript.common.PrintScriptUtil.reportToString;
+import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getJsonRules;
+import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.reportToString;
 
 import com.google.gson.JsonObject;
-import com.ingsis.jcli.printscript.common.ConsoleResult;
-import com.ingsis.jcli.printscript.common.PrintAccumulator;
-import com.ingsis.jcli.printscript.common.UiInputProvider;
+import com.ingsis.jcli.printscript.common.exceptions.VersionNotValid;
 import com.ingsis.jcli.printscript.common.requests.RuleDto;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
+import com.ingsis.jcli.printscript.common.responses.TestType;
+import com.ingsis.jcli.printscript.utils.ConsoleResult;
+import com.ingsis.jcli.printscript.utils.PrintAccumulator;
+import com.ingsis.jcli.printscript.utils.TestInputProvider;
+import com.ingsis.jcli.printscript.utils.UiInputProvider;
 import edu.FormatterResult;
 import edu.Report;
 import edu.Runner;
@@ -61,6 +64,7 @@ public class PrintScriptService {
     ConsoleResult consoleResult = new ConsoleResult();
     PrintAccumulator printAccumulator = new PrintAccumulator(consoleResult);
     UiInputProvider uiInputProvider = new UiInputProvider(printAccumulator);
+    // TODO RECEIVE LIVE EXECUTION
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);
     }
@@ -126,5 +130,44 @@ public class PrintScriptService {
             .collect(Collectors.toList());
 
     return rules;
+  }
+
+  public TestType runTestCase(
+      String name, String url, List<String> inputs, List<String> expectedOutputs, String version) {
+    InputStream code = snippetsService.getSnippetStream(name, url);
+
+    if (!availableVersions.contains(version)) {
+      throw new VersionNotValid(version);
+    }
+
+    ConsoleResult consoleResult = new ConsoleResult();
+    PrintAccumulator printAccumulator = new PrintAccumulator(consoleResult);
+    TestInputProvider uiInputProvider = new TestInputProvider(printAccumulator, inputs);
+
+    Runner runner = new Runner(version);
+    try {
+      runner.execute(code, uiInputProvider, printAccumulator);
+    } catch (Exception e) {
+      consoleResult.append(e.getMessage());
+      return TestType.INVALID;
+    }
+
+    List<String> prints = printAccumulator.getPrints();
+
+    return compareOutputs(prints, expectedOutputs);
+  }
+
+  private TestType compareOutputs(List<String> outputs, List<String> expectedOutputs) {
+    if (outputs.size() != expectedOutputs.size()) {
+      return TestType.INVALID;
+    }
+
+    for (int i = 0; i < outputs.size(); i++) {
+      if (!outputs.get(i).equals(expectedOutputs.get(i))) {
+        return TestType.INVALID;
+      }
+    }
+
+    return TestType.VALID;
   }
 }

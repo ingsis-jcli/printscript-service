@@ -1,6 +1,6 @@
 package com.ingsis.jcli.printscript.services;
 
-import static com.ingsis.jcli.printscript.common.PrintScriptUtil.getInputStreamFromString;
+import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getInputStreamFromString;
 
 import com.ingsis.jcli.printscript.clients.BucketRestClient;
 import com.ingsis.jcli.printscript.clients.factories.BucketRestTemplateFactory;

@@ -1,7 +1,7 @@
 package com.ingsis.jcli.printscript.printscript;
 
-import static com.ingsis.jcli.printscript.common.PrintScriptUtil.getInputStreamFromString;
 import static com.ingsis.jcli.printscript.common.TestUtils.getStringFromFile;
+import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getInputStreamFromString;
 import static org.mockito.Mockito.when;
 
 import com.ingsis.jcli.printscript.clients.PermissionsClient;
@@ -9,6 +9,7 @@ import com.ingsis.jcli.printscript.clients.SnippetsClient;
 import com.ingsis.jcli.printscript.common.FileType;
 import com.ingsis.jcli.printscript.common.OperationType;
 import com.ingsis.jcli.printscript.common.requests.RuleDto;
+import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import com.ingsis.jcli.printscript.services.SnippetsService;
 import java.util.List;
@@ -92,5 +93,18 @@ public class PrintScriptServiceTest {
       String output = printScriptService.execute(caseName, url, "1.1");
       assert output.equals(expected.get());
     }
+  }
+
+  @Test
+  void testRunTestCase() {
+    String url = "/test";
+    List<String> inputs = List.of("1");
+    List<String> output = List.of("3");
+    Optional<String> code = getStringFromFile(OperationType.TEST, "test1", FileType.INPUT);
+    when(snippetsService.getSnippetStream("test1", url))
+        .thenReturn(getInputStreamFromString(code.get()));
+    TestType type = printScriptService.runTestCase("test1", url, inputs, output, "1.1");
+    System.out.println("TYPE: " + type);
+    assert type.equals(TestType.VALID);
   }
 }

@@ -1,7 +1,7 @@
 package com.ingsis.jcli.printscript.printscript;
 
-import static com.ingsis.jcli.printscript.common.PrintScriptUtil.getInputStreamFromString;
 import static com.ingsis.jcli.printscript.common.TestUtils.getStringFromFile;
+import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getInputStreamFromString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -15,8 +15,10 @@ import com.ingsis.jcli.printscript.common.requests.AnalyzeRequest;
 import com.ingsis.jcli.printscript.common.requests.ExecuteRequest;
 import com.ingsis.jcli.printscript.common.requests.FormatRequest;
 import com.ingsis.jcli.printscript.common.requests.RuleDto;
+import com.ingsis.jcli.printscript.common.requests.TestCaseRequest;
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
+import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.controllers.PrintScriptController;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import com.ingsis.jcli.printscript.services.SnippetsService;
@@ -172,5 +174,31 @@ public class PrintScriptControllerTest {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Test
+  void testRunTest() throws Exception {
+    String url = "/test";
+    String name = "test1";
+    String version = "1.1";
+    List<String> inputs = List.of("input1", "input2");
+    List<String> expectedOutputs = List.of("output1", "output2");
+
+    TestType expectedTestType = TestType.VALID;
+
+    TestCaseRequest testCaseRequest =
+        new TestCaseRequest(name, url, version, inputs, expectedOutputs);
+
+    when(printScriptService.runTestCase(name, url, inputs, expectedOutputs, version))
+        .thenReturn(expectedTestType);
+
+    mockMvc
+        .perform(
+            post("/test")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(testCaseRequest))
+                .with(SecurityMockMvcRequestPostProcessors.jwt()))
+        .andExpect(status().isOk())
+        .andExpect(content().string("\"" + TestType.VALID.toString() + "\""));
   }
 }

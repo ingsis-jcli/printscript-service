@@ -1,4 +1,4 @@
-package com.ingsis.jcli.printscript.common;
+package com.ingsis.jcli.printscript.utils;
 
 public class ConsoleResult {
   private StringBuilder result;

@@ -4,8 +4,10 @@ import com.ingsis.jcli.printscript.common.requests.AnalyzeRequest;
 import com.ingsis.jcli.printscript.common.requests.ExecuteRequest;
 import com.ingsis.jcli.printscript.common.requests.FormatRequest;
 import com.ingsis.jcli.printscript.common.requests.RuleDto;
+import com.ingsis.jcli.printscript.common.requests.TestCaseRequest;
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
+import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.util.List;
 import java.util.Objects;
@@ -102,5 +104,20 @@ public class PrintScriptController {
     List<RuleDto> rules = printScriptService.getDefaultLintingRules(version);
     log.info(marker, "Rules: " + rules);
     return new ResponseEntity<>(rules, HttpStatus.OK);
+  }
+
+  @PostMapping(
+      value = "/test",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<TestType> runTestCase(@RequestBody TestCaseRequest testCaseRequest) {
+    TestType testType =
+        printScriptService.runTestCase(
+            testCaseRequest.snippetName(),
+            testCaseRequest.url(),
+            testCaseRequest.input(),
+            testCaseRequest.output(),
+            testCaseRequest.version());
+    return new ResponseEntity<>(testType, HttpStatus.OK);
   }
 }

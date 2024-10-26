@@ -1,4 +1,4 @@
-package com.ingsis.jcli.printscript.common;
+package com.ingsis.jcli.printscript.utils;
 
 import edu.InputProvider;
 import edu.PrintEmitter;
@@ -13,8 +13,7 @@ public class UiInputProvider implements InputProvider {
   @Override
   public String input(String s) {
     printEmitter.print(s);
-    // TODO
-    // ASK UI FOR INPUT
+    // TODO : implement live execution
     return "";
   }
 }

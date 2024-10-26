@@ -1,6 +1,7 @@
 package com.ingsis.jcli.printscript.advice;
 
 import com.ingsis.jcli.printscript.common.exceptions.SnippetNotFoundException;
+import com.ingsis.jcli.printscript.common.exceptions.VersionNotValid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,5 +17,11 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleInvalidSnippetException(
       SnippetNotFoundException ex, WebRequest request) {
     return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(VersionNotValid.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<String> handleInvalidVersion(VersionNotValid ex, WebRequest request) {
+    return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
   }
 }
