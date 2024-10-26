@@ -1,7 +1,5 @@
 package com.ingsis.jcli.printscript.consumers;
 
-import com.ingsis.jcli.printscript.common.responses.TestType;
-import com.ingsis.jcli.printscript.consumers.requests.PendingTestCaseProduct;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Profile("!test")
 @Slf4j
 @Component
-public class TestCaseRunConsumer extends RedisStreamConsumer<PendingTestCaseProduct> {
+public class TestCaseRunConsumer extends RedisStreamConsumer<String> {
 
   private final PrintScriptService printScriptService;
 
@@ -34,32 +32,20 @@ public class TestCaseRunConsumer extends RedisStreamConsumer<PendingTestCaseProd
 
   @NotNull
   @Override
-  protected StreamReceiver.StreamReceiverOptions<
-          String, ObjectRecord<String, PendingTestCaseProduct>>
-      options() {
+  protected StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, String>> options() {
     return StreamReceiver.StreamReceiverOptions.builder()
         .pollTimeout(Duration.ofMillis(10000))
-        .targetType(PendingTestCaseProduct.class)
+        .targetType(String.class)
         .build();
   }
 
   @Override
-  protected void onMessage(@NotNull ObjectRecord<String, PendingTestCaseProduct> objectRecord) {
-    PendingTestCaseProduct testCase = objectRecord.getValue();
+  protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
+    String testCase = objectRecord.getValue();
     if (testCase == null) {
       log.error("Received null testCase, check the serialization and JSON structure");
       return;
     }
-    log.info("Running test case with id: " + testCase.id());
-
-    TestType type =
-        printScriptService.runTestCase(
-            testCase.snippetName(),
-            testCase.url(),
-            testCase.input(),
-            testCase.output(),
-            testCase.version());
-
-    log.info("Test case with id: " + testCase.id() + " ran with result: " + type);
+    log.info("Received test case: {}", testCase);
   }
 }

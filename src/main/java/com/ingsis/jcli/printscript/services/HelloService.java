@@ -12,9 +12,7 @@ public class HelloService {
   private final SnippetsClient snippetsClient;
 
   @Autowired
-  public HelloService(
-      PermissionsClient permissionsClient,
-      SnippetsClient snippetsClient) {
+  public HelloService(PermissionsClient permissionsClient, SnippetsClient snippetsClient) {
     this.permissionsClient = permissionsClient;
     this.snippetsClient = snippetsClient;
   }
