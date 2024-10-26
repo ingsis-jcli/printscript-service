@@ -1,5 +1,8 @@
 package com.ingsis.jcli.printscript.consumers;
 
+import static com.ingsis.jcli.printscript.consumers.DeserializerUtil.deserializeIntoTestCase;
+
+import com.ingsis.jcli.printscript.common.responses.TestCaseProduct;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +49,11 @@ public class TestCaseRunConsumer extends RedisStreamConsumer<String> {
       log.error("Received null testCase, check the serialization and JSON structure");
       return;
     }
-    log.info("Received test case: {}", testCase);
+    TestCaseProduct testCaseProduct = deserializeIntoTestCase(testCase);
+    log.info("Processing testCase: " + testCaseProduct.getId());
+    log.info("Snippet: " + testCaseProduct.getSnippetName());
+    log.info("URL: " + testCaseProduct.getUrl());
+    log.info("Input: " + testCaseProduct.getInput());
+    log.info("Output: " + testCaseProduct.getOutput());
   }
 }
