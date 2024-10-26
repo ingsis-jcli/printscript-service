@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ingsis.jcli.printscript.common.responses.TestType;
-import com.ingsis.jcli.printscript.consumers.requests.PendingTestCaseRun;
+import com.ingsis.jcli.printscript.consumers.requests.PendingTestCaseProduct;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
 import java.util.List;
@@ -35,10 +35,10 @@ class TestCaseRunConsumerTest {
 
   @Test
   void testOptions() {
-    StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, PendingTestCaseRun>> options =
-        testCaseRunConsumer.options();
+    StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, PendingTestCaseProduct>>
+        options = testCaseRunConsumer.options();
     assertEquals(Duration.ofMillis(10000), options.getPollTimeout());
-    assertEquals(PendingTestCaseRun.class, options.getTargetType());
+    assertEquals(PendingTestCaseProduct.class, options.getTargetType());
   }
 
   @Test
@@ -50,9 +50,9 @@ class TestCaseRunConsumerTest {
     List<String> input = List.of("5");
     List<String> output = List.of("7");
 
-    PendingTestCaseRun pendingTestCaseRun =
-        new PendingTestCaseRun(id, snippetName, url, version, input, output);
-    ObjectRecord<String, PendingTestCaseRun> record =
+    PendingTestCaseProduct pendingTestCaseRun =
+        new PendingTestCaseProduct(id, snippetName, url, version, input, output);
+    ObjectRecord<String, PendingTestCaseProduct> record =
         ObjectRecord.create("testCaseStream", pendingTestCaseRun);
 
     when(printScriptService.runTestCase(snippetName, url, input, output, version))

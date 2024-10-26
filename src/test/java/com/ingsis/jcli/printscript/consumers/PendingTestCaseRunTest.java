@@ -2,7 +2,7 @@ package com.ingsis.jcli.printscript.consumers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.ingsis.jcli.printscript.consumers.requests.PendingTestCaseRun;
+import com.ingsis.jcli.printscript.consumers.requests.PendingTestCaseProduct;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -17,8 +17,8 @@ class PendingTestCaseRunTest {
     List<String> input = List.of("5");
     List<String> output = List.of("7");
 
-    PendingTestCaseRun pendingTestCaseRun =
-        new PendingTestCaseRun(id, snippetName, url, version, input, output);
+    PendingTestCaseProduct pendingTestCaseRun =
+        new PendingTestCaseProduct(id, snippetName, url, version, input, output);
 
     assertEquals(id, pendingTestCaseRun.id());
     assertEquals(snippetName, pendingTestCaseRun.snippetName());
