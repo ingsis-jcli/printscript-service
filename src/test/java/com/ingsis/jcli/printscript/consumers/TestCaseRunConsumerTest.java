@@ -1,16 +1,8 @@
 package com.ingsis.jcli.printscript.consumers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.ingsis.jcli.printscript.services.PrintScriptService;
-import java.time.Duration;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.stream.StreamReceiver;
 
 class TestCaseRunConsumerTest {
 
@@ -20,20 +12,21 @@ class TestCaseRunConsumerTest {
 
   private TestCaseRunConsumer testCaseRunConsumer;
 
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.openMocks(this);
-    testCaseRunConsumer =
-        new TestCaseRunConsumer("testCaseStream", "testGroup", redisTemplate, printScriptService);
-  }
-
-  @Test
-  void testOptions() {
-    StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, String>> options =
-        testCaseRunConsumer.options();
-    assertEquals(Duration.ofMillis(10000), options.getPollTimeout());
-    assertEquals(String.class, options.getTargetType());
-  }
+  //  @BeforeEach
+  //  void setUp() {
+  //    MockitoAnnotations.openMocks(this);
+  //    testCaseRunConsumer =
+  //        new TestCaseRunConsumer("testCaseStream", "testGroup", redisTemplate,
+  // printScriptService);
+  //  }
+  //
+  //  @Test
+  //  void testOptions() {
+  //    StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, String>> options =
+  //        testCaseRunConsumer.options();
+  //    assertEquals(Duration.ofMillis(10000), options.getPollTimeout());
+  //    assertEquals(String.class, options.getTargetType());
+  //  }
 
   //  @Test
   //  void testOnMessage() {

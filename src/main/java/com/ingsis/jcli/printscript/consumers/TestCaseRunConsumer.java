@@ -4,6 +4,7 @@ import static com.ingsis.jcli.printscript.consumers.DeserializerUtil.deserialize
 
 import com.ingsis.jcli.printscript.common.responses.TestCaseProduct;
 import com.ingsis.jcli.printscript.common.responses.TestType;
+import com.ingsis.jcli.printscript.producers.TestResultProducer;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -23,15 +24,18 @@ import org.springframework.stereotype.Component;
 public class TestCaseRunConsumer extends RedisStreamConsumer<String> {
 
   private final PrintScriptService printScriptService;
+  private final TestResultProducer testResultProducer;
 
   @Autowired
   public TestCaseRunConsumer(
       @Value("${test_case_stream.key}") String streamKey,
       @Value("${test_case.groups.product}") String groupId,
       @NotNull RedisTemplate<String, String> redis,
-      PrintScriptService printScriptService) {
+      PrintScriptService printScriptService,
+      TestResultProducer testResultProducer) {
     super(streamKey, groupId, redis);
     this.printScriptService = printScriptService;
+    this.testResultProducer = testResultProducer;
   }
 
   @NotNull
@@ -60,5 +64,7 @@ public class TestCaseRunConsumer extends RedisStreamConsumer<String> {
             testCaseProduct.getOutput(),
             testCaseProduct.getVersion());
     log.info("Test result for testCase " + testCaseProduct.getId() + ": " + type);
+
+    testResultProducer.returnResult(type, testCaseProduct.getId());
   }
 }
