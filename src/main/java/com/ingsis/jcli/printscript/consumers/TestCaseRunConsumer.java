@@ -25,7 +25,7 @@ public class TestCaseRunConsumer extends RedisStreamConsumer<PendingTestCaseProd
   @Autowired
   public TestCaseRunConsumer(
       @Value("${test_case_stream.key}") String streamKey,
-      @Value("${linting.groups.product}") String groupId,
+      @Value("${test_case.groups.product}") String groupId,
       @NotNull RedisTemplate<String, String> redis,
       PrintScriptService printScriptService) {
     super(streamKey, groupId, redis);
