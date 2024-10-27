@@ -133,7 +133,8 @@ public class PrintScriptService {
 
               if (value.isJsonPrimitive()) {
                 if (value.getAsJsonPrimitive().isNumber()) {
-                  rules.add(new RuleDto(false, key, value.getAsNumber().toString()));
+                  int intValue = value.getAsInt();
+                  rules.add(new RuleDto(false, key, String.valueOf(intValue)));
                 } else {
                   rules.add(new RuleDto(false, key, null));
                 }
