@@ -21,6 +21,7 @@ import com.ingsis.jcli.printscript.common.requests.TestCaseRequest;
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.common.responses.FormatResponse;
+import com.ingsis.jcli.printscript.common.responses.ProcessStatus;
 import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.controllers.PrintScriptController;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
@@ -63,10 +64,14 @@ public class PrintScriptControllerTest {
     String expected = getStringFromFile(OperationType.FORMAT, name, FileType.OUTPUT).get();
 
     when(printScriptService.format(name, url, rules, "1.1"))
-        .thenReturn(new FormatResponse(expected, false));
+        .thenReturn(new FormatResponse(expected, ProcessStatus.NON_COMPLIANT));
     when(snippetsService.getSnippetStream(url, name)).thenReturn(getInputStreamFromString(input));
 
     FormatRequest req = new FormatRequest(name, url, rules, "1.1");
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    String jsonResponse =
+        objectMapper.writeValueAsString(new FormatResponse(expected, ProcessStatus.NON_COMPLIANT));
 
     mockMvc
         .perform(
@@ -75,12 +80,7 @@ public class PrintScriptControllerTest {
                 .content(asJsonString(req))
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
-        .andExpect(
-            content()
-                .json(
-                    "{\"content\":\""
-                        + expected.replace("\"", "\\\"")
-                        + "\", \"isCompliant\": false}"));
+        .andExpect(content().json(jsonResponse));
   }
 
   @Test

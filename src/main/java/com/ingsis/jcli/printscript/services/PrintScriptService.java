@@ -9,6 +9,7 @@ import com.ingsis.jcli.printscript.common.exceptions.VersionNotValid;
 import com.ingsis.jcli.printscript.common.requests.RuleDto;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.common.responses.FormatResponse;
+import com.ingsis.jcli.printscript.common.responses.ProcessStatus;
 import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.utils.ConsoleResult;
 import com.ingsis.jcli.printscript.utils.PrintAccumulator;
@@ -49,9 +50,9 @@ public class PrintScriptService {
     Runner runner = new Runner(version);
     FormatterResult result = runner.format(code, rules);
     if (result.getResult().equals(original)) {
-      return new FormatResponse(original, false);
+      return new FormatResponse(original, ProcessStatus.NON_COMPLIANT);
     }
-    return new FormatResponse(result.getResult(), true);
+    return new FormatResponse(result.getResult(), ProcessStatus.COMPLIANT);
   }
 
   public ErrorResponse analyze(String name, String url, List<RuleDto> rules, String version) {

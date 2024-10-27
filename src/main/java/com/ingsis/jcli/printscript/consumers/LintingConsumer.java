@@ -4,7 +4,9 @@ import static com.ingsis.jcli.printscript.consumers.DeserializerUtil.deserialize
 
 import com.ingsis.jcli.printscript.common.Generated;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
+import com.ingsis.jcli.printscript.common.responses.ProcessStatus;
 import com.ingsis.jcli.printscript.consumers.products.LintOrFormatRequestProduct;
+import com.ingsis.jcli.printscript.producers.SnippetStatusUpdateProducer;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +27,18 @@ import org.springframework.stereotype.Component;
 public class LintingConsumer extends RedisStreamConsumer<String> {
 
   private final PrintScriptService printScriptService;
+  private final SnippetStatusUpdateProducer snippetStatusUpdateProducer;
 
   @Autowired
   public LintingConsumer(
       @Value("${linting_stream.key}") String streamKey,
       @Value("${linting.groups.product}") String groupId,
       @NotNull RedisTemplate<String, String> redis,
-      PrintScriptService printScriptService) {
+      PrintScriptService printScriptService,
+      SnippetStatusUpdateProducer snippetStatusUpdateProducer) {
     super(streamKey, groupId, redis);
     this.printScriptService = printScriptService;
+    this.snippetStatusUpdateProducer = snippetStatusUpdateProducer;
   }
 
   @NotNull
@@ -67,8 +72,12 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
     // TODO IMPLEMENT WHAT TO DO WITH RESULT
 
     if (result.error().isBlank() || result.error().isEmpty()) {
+      snippetStatusUpdateProducer.updateStatus(
+          lintRequestProduct.getSnippetId(), "lint", ProcessStatus.COMPLIANT);
       log.info("Snippet " + lintRequestProduct.getSnippetId() + " linted successfully");
     } else {
+      snippetStatusUpdateProducer.updateStatus(
+          lintRequestProduct.getSnippetId(), "lint", ProcessStatus.NON_COMPLIANT);
       log.error(
           "Error linting snippet " + lintRequestProduct.getSnippetId() + ": " + result.error());
     }
