@@ -54,13 +54,9 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
   protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
     String lintRequest = objectRecord.getValue();
     if (lintRequest == null) {
-      log.error("Received null lint request, check the serialization and JSON structure");
       return;
     }
-    log.info("Processing lint request: " + lintRequest);
     LintOrFormatRequestProduct lintRequestProduct = deserializeIntoRequestProduct(lintRequest);
-
-    System.out.println("Linting rules: " + lintRequestProduct.getRules());
 
     ErrorResponse result =
         printScriptService.analyze(
@@ -69,17 +65,12 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
             lintRequestProduct.getRules(),
             lintRequestProduct.getVersion());
 
-    // TODO IMPLEMENT WHAT TO DO WITH RESULT
-
     if (result.error().isBlank() || result.error().isEmpty()) {
       snippetStatusUpdateProducer.updateStatus(
           lintRequestProduct.getSnippetId(), "lint", ProcessStatus.COMPLIANT);
-      log.info("Snippet " + lintRequestProduct.getSnippetId() + " linted successfully");
     } else {
       snippetStatusUpdateProducer.updateStatus(
           lintRequestProduct.getSnippetId(), "lint", ProcessStatus.NON_COMPLIANT);
-      log.error(
-          "Error linting snippet " + lintRequestProduct.getSnippetId() + ": " + result.error());
     }
   }
 }

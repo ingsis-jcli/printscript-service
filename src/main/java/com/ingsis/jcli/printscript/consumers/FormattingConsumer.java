@@ -53,10 +53,8 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
   protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
     String formatRequest = objectRecord.getValue();
     if (formatRequest == null) {
-      log.error("Received null format request, check the serialization and JSON structure");
       return;
     }
-    log.info("Processing format request: " + formatRequest);
     LintOrFormatRequestProduct formatRequestProduct = deserializeIntoRequestProduct(formatRequest);
     FormatResponse result =
         printScriptService.format(
@@ -65,7 +63,6 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
             formatRequestProduct.getRules(),
             formatRequestProduct.getVersion());
 
-    log.info("The code is compliant to the formatting rules: " + result.status());
     snippetStatusUpdateProducer.updateStatus(
         formatRequestProduct.getSnippetId(), "format", result.status());
   }
