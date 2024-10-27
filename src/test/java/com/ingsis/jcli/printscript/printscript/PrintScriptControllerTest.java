@@ -20,6 +20,7 @@ import com.ingsis.jcli.printscript.common.requests.RuleDto;
 import com.ingsis.jcli.printscript.common.requests.TestCaseRequest;
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
+import com.ingsis.jcli.printscript.common.responses.FormatResponse;
 import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.controllers.PrintScriptController;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
@@ -53,15 +54,16 @@ public class PrintScriptControllerTest {
     String name = "test1";
     List<RuleDto> rules =
         List.of(
-            new RuleDto(true, "declaration_space_before_colon", "true"),
-            new RuleDto(true, "declaration_space_after_colon", "true"),
-            new RuleDto(true, "declaration_space_before_equals", "true"),
-            new RuleDto(true, "declaration_space_after_equals", "true"),
+            new RuleDto(true, "declaration_space_before_colon", null),
+            new RuleDto(true, "declaration_space_after_colon", null),
+            new RuleDto(true, "declaration_space_before_equals", null),
+            new RuleDto(true, "declaration_space_after_equals", null),
             new RuleDto(true, "println_new_lines_before_call", "0"));
     String input = getStringFromFile(OperationType.FORMAT, name, FileType.INPUT).get();
     String expected = getStringFromFile(OperationType.FORMAT, name, FileType.OUTPUT).get();
 
-    when(printScriptService.format(name, url, rules, "1.1")).thenReturn(expected);
+    when(printScriptService.format(name, url, rules, "1.1"))
+        .thenReturn(new FormatResponse(expected, false));
     when(snippetsService.getSnippetStream(url, name)).thenReturn(getInputStreamFromString(input));
 
     FormatRequest req = new FormatRequest(name, url, rules, "1.1");
@@ -73,7 +75,12 @@ public class PrintScriptControllerTest {
                 .content(asJsonString(req))
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
-        .andExpect(content().string(expected));
+        .andExpect(
+            content()
+                .json(
+                    "{\"content\":\""
+                        + expected.replace("\"", "\\\"")
+                        + "\", \"isCompliant\": false}"));
   }
 
   @Test
@@ -84,7 +91,8 @@ public class PrintScriptControllerTest {
     String expected = getStringFromFile(OperationType.ANALYZE, name, FileType.OUTPUT).get();
     List<RuleDto> rules = List.of();
 
-    when(printScriptService.analyze(name, url, rules, "1.1")).thenReturn(expected);
+    when(printScriptService.analyze(name, url, rules, "1.1"))
+        .thenReturn(new ErrorResponse(expected));
     when(snippetsService.getSnippetStream(name, url)).thenReturn(getInputStreamFromString(input));
 
     AnalyzeRequest req = new AnalyzeRequest(name, url, rules, "1.1");
@@ -96,7 +104,7 @@ public class PrintScriptControllerTest {
                 .content(asJsonString(req))
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
-        .andExpect(content().string(expected));
+        .andExpect(content().json("{\"error\":\"" + expected + "\"}"));
   }
 
   @Test

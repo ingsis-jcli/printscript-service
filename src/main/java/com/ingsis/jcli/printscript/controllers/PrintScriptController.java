@@ -7,6 +7,7 @@ import com.ingsis.jcli.printscript.common.requests.RuleDto;
 import com.ingsis.jcli.printscript.common.requests.TestCaseRequest;
 import com.ingsis.jcli.printscript.common.requests.ValidateRequest;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
+import com.ingsis.jcli.printscript.common.responses.FormatResponse;
 import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.util.List;
@@ -58,8 +59,8 @@ public class PrintScriptController {
   }
 
   @PostMapping("/format")
-  public ResponseEntity<String> format(@RequestBody FormatRequest formatRequest) {
-    String formattedSnippet =
+  public ResponseEntity<FormatResponse> format(@RequestBody FormatRequest formatRequest) {
+    FormatResponse formattedSnippet =
         printScriptService.format(
             formatRequest.name(),
             formatRequest.url(),
@@ -69,8 +70,8 @@ public class PrintScriptController {
   }
 
   @PostMapping("/analyze")
-  public ResponseEntity<String> analyze(@RequestBody AnalyzeRequest analyzeRequest) {
-    String report =
+  public ResponseEntity<ErrorResponse> analyze(@RequestBody AnalyzeRequest analyzeRequest) {
+    ErrorResponse report =
         printScriptService.analyze(
             analyzeRequest.name(),
             analyzeRequest.url(),

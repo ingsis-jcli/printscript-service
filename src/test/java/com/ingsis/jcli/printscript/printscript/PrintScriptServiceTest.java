@@ -2,6 +2,7 @@ package com.ingsis.jcli.printscript.printscript;
 
 import static com.ingsis.jcli.printscript.common.TestUtils.getStringFromFile;
 import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getInputStreamFromString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -12,6 +13,8 @@ import com.ingsis.jcli.printscript.clients.SnippetsClient;
 import com.ingsis.jcli.printscript.common.FileType;
 import com.ingsis.jcli.printscript.common.OperationType;
 import com.ingsis.jcli.printscript.common.requests.RuleDto;
+import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
+import com.ingsis.jcli.printscript.common.responses.FormatResponse;
 import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import com.ingsis.jcli.printscript.services.SnippetsService;
@@ -46,16 +49,16 @@ public class PrintScriptServiceTest {
     Optional<String> expected = getStringFromFile(OperationType.FORMAT, "test1", FileType.OUTPUT);
     List<RuleDto> rules =
         List.of(
-            new RuleDto(true, "declaration_space_before_colon", "true"),
-            new RuleDto(true, "declaration_space_after_colon", "true"),
-            new RuleDto(true, "assignment_space_after_equals", "true"),
-            new RuleDto(true, "assignment_space_after_equals", "true"),
+            new RuleDto(true, "declaration_space_before_colon", null),
+            new RuleDto(true, "declaration_space_after_colon", null),
+            new RuleDto(true, "assignment_space_before_equals", null),
+            new RuleDto(true, "assignment_space_after_equals", null),
             new RuleDto(true, "println_new_lines_before_call", "0"));
-    when(snippetsService.getSnippetStream(name, url))
+    when(snippetsService.getSnippetString(name, url)).thenReturn(input.get());
+    when(snippetsService.getSnippetStreamFromString(input.get()))
         .thenReturn(getInputStreamFromString(input.get()));
-    String output = printScriptService.format(name, url, rules, "1.1");
-    System.out.println("OUTPUT: " + output);
-    System.out.println("EXPECTED: " + expected.get());
+    FormatResponse output = printScriptService.format(name, url, rules, "1.1");
+    assertEquals(expected.get(), output.content());
   }
 
   @Test
@@ -78,9 +81,9 @@ public class PrintScriptServiceTest {
       when(snippetsService.getSnippetStream(testCase.getKey(), url))
           .thenReturn(getInputStreamFromString(input.get()));
 
-      String output =
+      ErrorResponse output =
           printScriptService.analyze(testCase.getKey(), url, testCase.getValue(), "1.1");
-      assert output.equals(expected.get());
+      assert output.error().equals(expected.get());
     }
   }
 

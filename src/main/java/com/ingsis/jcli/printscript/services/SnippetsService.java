@@ -24,6 +24,18 @@ public class SnippetsService {
     return Optional.ofNullable(snippet);
   }
 
+  public String getSnippetString(String name, String container) {
+    Optional<String> content = getSnippet(name, container);
+    if (content.isPresent()) {
+      return content.get();
+    }
+    throw new SnippetNotFoundException(name, container);
+  }
+
+  public InputStream getSnippetStreamFromString(String snippet) {
+    return getInputStreamFromString(snippet);
+  }
+
   public InputStream getSnippetStream(String name, String container) {
     Optional<String> content = getSnippet(name, container);
     if (content.isPresent()) {

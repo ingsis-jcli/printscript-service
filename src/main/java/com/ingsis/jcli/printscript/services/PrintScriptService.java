@@ -1,5 +1,6 @@
 package com.ingsis.jcli.printscript.services;
 
+import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getJsonFormattingRules;
 import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getJsonLintingRules;
 import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.reportToString;
 
@@ -7,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.ingsis.jcli.printscript.common.exceptions.VersionNotValid;
 import com.ingsis.jcli.printscript.common.requests.RuleDto;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
+import com.ingsis.jcli.printscript.common.responses.FormatResponse;
 import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.utils.ConsoleResult;
 import com.ingsis.jcli.printscript.utils.PrintAccumulator;
@@ -37,27 +39,34 @@ public class PrintScriptService {
     this.snippetsService = snippetsService;
   }
 
-  public String format(String name, String url, List<RuleDto> config, String version) {
-    InputStream code = snippetsService.getSnippetStream(name, url);
-    JsonObject rules = getJsonLintingRules(config); // TODO GET JSON FORMATTING RULES
+  public FormatResponse format(String name, String url, List<RuleDto> config, String version) {
+    String original = snippetsService.getSnippetString(name, url);
+    InputStream code = snippetsService.getSnippetStreamFromString(original);
+    JsonObject rules = getJsonFormattingRules(config);
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);
     }
     Runner runner = new Runner(version);
     FormatterResult result = runner.format(code, rules);
-    return result.getResult();
+    if (result.getResult().equals(original)) {
+      return new FormatResponse(original, false);
+    }
+    return new FormatResponse(result.getResult(), true);
   }
 
-  public String analyze(String name, String url, List<RuleDto> rules, String version) {
+  public ErrorResponse analyze(String name, String url, List<RuleDto> rules, String version) {
     JsonObject rulesJson = getJsonLintingRules(rules);
-    System.out.println("Json Rules: " + rulesJson);
+    System.out.println("Json Linting Rules: " + rulesJson);
     InputStream code = snippetsService.getSnippetStream(name, url);
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);
     }
     Runner runner = new Runner(version);
     Report result = runner.analyze(code, rulesJson);
-    return reportToString(result);
+    if (result.getReport().isEmpty()) {
+      return new ErrorResponse("");
+    }
+    return new ErrorResponse(reportToString(result));
   }
 
   public String execute(String name, String url, String version) {

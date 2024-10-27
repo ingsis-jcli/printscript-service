@@ -3,6 +3,7 @@ package com.ingsis.jcli.printscript.consumers;
 import static com.ingsis.jcli.printscript.consumers.DeserializerUtil.deserializeIntoRequestProduct;
 
 import com.ingsis.jcli.printscript.common.Generated;
+import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
 import com.ingsis.jcli.printscript.consumers.products.LintOrFormatRequestProduct;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
@@ -56,7 +57,7 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
 
     System.out.println("Linting rules: " + lintRequestProduct.getRules());
 
-    String result =
+    ErrorResponse result =
         printScriptService.analyze(
             lintRequestProduct.getName(),
             lintRequestProduct.getUrl(),
@@ -65,6 +66,11 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
 
     // TODO IMPLEMENT WHAT TO DO WITH RESULT
 
-    log.info("Result for snippetId " + lintRequestProduct.getSnippetId() + ": " + result);
+    if (result.error().isBlank() || result.error().isEmpty()) {
+      log.info("Snippet " + lintRequestProduct.getSnippetId() + " linted successfully");
+    } else {
+      log.error(
+          "Error linting snippet " + lintRequestProduct.getSnippetId() + ": " + result.error());
+    }
   }
 }

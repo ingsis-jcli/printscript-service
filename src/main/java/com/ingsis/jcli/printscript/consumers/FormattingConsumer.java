@@ -3,6 +3,7 @@ package com.ingsis.jcli.printscript.consumers;
 import static com.ingsis.jcli.printscript.consumers.DeserializerUtil.deserializeIntoRequestProduct;
 
 import com.ingsis.jcli.printscript.common.Generated;
+import com.ingsis.jcli.printscript.common.responses.FormatResponse;
 import com.ingsis.jcli.printscript.consumers.products.LintOrFormatRequestProduct;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
@@ -53,15 +54,14 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
     }
     log.info("Processing testCase: " + formatRequest);
     LintOrFormatRequestProduct formatRequestProduct = deserializeIntoRequestProduct(formatRequest);
-    String result =
+    FormatResponse result =
         printScriptService.format(
             formatRequestProduct.getName(),
             formatRequestProduct.getUrl(),
             formatRequestProduct.getRules(),
             formatRequestProduct.getVersion());
 
-    log.info("Result for snippetId " + formatRequestProduct.getSnippetId() + ": " + result);
-
+    log.info("The code is compliant to the formatting rules: " + result.isCompliant());
     // TODO IMPLEMENT WHAT TO DO WITH RESULT
 
   }

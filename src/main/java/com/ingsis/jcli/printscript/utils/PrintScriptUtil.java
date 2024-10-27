@@ -28,6 +28,20 @@ public class PrintScriptUtil {
     return jsonObject;
   }
 
+  public static JsonObject getJsonFormattingRules(List<RuleDto> rules) {
+    JsonObject jsonObject = new JsonObject();
+    for (RuleDto rule : rules) {
+      if (rule.isActive()) {
+        if (rule.value() != null) {
+          jsonObject.addProperty(rule.name(), Integer.parseInt(rule.value()));
+        } else {
+          jsonObject.addProperty(rule.name(), true);
+        }
+      }
+    }
+    return jsonObject;
+  }
+
   public static String reportToString(Report report) {
     StringBuilder sb = new StringBuilder();
     Optional<List<String>> messages = report.getReport();
