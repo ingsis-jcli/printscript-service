@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.gson.JsonObject;
 import com.ingsis.jcli.printscript.common.responses.ProcessStatus;
+import com.ingsis.jcli.printscript.common.responses.TestType;
 import org.junit.jupiter.api.Test;
 
 public class SerializerUtilTest {
@@ -64,6 +65,42 @@ public class SerializerUtilTest {
 
     String resultJsonString =
         SerializerUtil.serializeIntoStatusUpdate(snippetId, operation, status);
+
+    assertEquals(
+        expectedJsonString,
+        resultJsonString,
+        "The serialized JSON string does not match the expected output.");
+  }
+
+  @Test
+  void testSerializeIntoTestCase() {
+    Long testCaseId = 789L;
+    TestType type = TestType.VALID;
+
+    JsonObject expectedJson = new JsonObject();
+    expectedJson.addProperty("testCaseId", testCaseId);
+    expectedJson.addProperty("type", type.name());
+    String expectedJsonString = expectedJson.toString();
+
+    String resultJsonString = SerializerUtil.serializeIntoTestCase(testCaseId, type);
+
+    assertEquals(
+        expectedJsonString,
+        resultJsonString,
+        "The serialized JSON string does not match the expected output.");
+  }
+
+  @Test
+  void testSerializeIntoTestCaseWithDifferentValues() {
+    Long testCaseId = 987L;
+    TestType type = TestType.INVALID;
+
+    JsonObject expectedJson = new JsonObject();
+    expectedJson.addProperty("testCaseId", testCaseId);
+    expectedJson.addProperty("type", type.name());
+    String expectedJsonString = expectedJson.toString();
+
+    String resultJsonString = SerializerUtil.serializeIntoTestCase(testCaseId, type);
 
     assertEquals(
         expectedJsonString,

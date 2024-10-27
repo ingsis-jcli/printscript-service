@@ -1,6 +1,7 @@
 package com.ingsis.jcli.printscript.producers;
 
-import com.google.gson.JsonObject;
+import static com.ingsis.jcli.printscript.producers.SerializerUtil.serializeIntoTestCase;
+
 import com.ingsis.jcli.printscript.common.responses.TestType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,10 +18,6 @@ public class TestResultProducer extends JavaRedisStreamProducer {
   }
 
   public void returnResult(TestType type, Long testCaseId) {
-    JsonObject jsonObject = new JsonObject();
-    jsonObject.addProperty("testCaseId", testCaseId);
-    jsonObject.addProperty("type", type.name());
-    System.out.println(jsonObject);
-    emit(jsonObject.toString());
+    emit(serializeIntoTestCase(testCaseId, type));
   }
 }

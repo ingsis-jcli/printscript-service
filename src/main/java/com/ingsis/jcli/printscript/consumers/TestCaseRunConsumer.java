@@ -53,11 +53,9 @@ public class TestCaseRunConsumer extends RedisStreamConsumer<String> {
   protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
     String testCase = objectRecord.getValue();
     if (testCase == null) {
-      log.error("Received null testCase, check the serialization and JSON structure");
       return;
     }
     TestCaseProduct testCaseProduct = deserializeIntoTestCase(testCase);
-    log.info("Processing testCase: " + testCaseProduct.getId());
     TestType type =
         printScriptService.runTestCase(
             testCaseProduct.getSnippetName(),
@@ -65,8 +63,6 @@ public class TestCaseRunConsumer extends RedisStreamConsumer<String> {
             testCaseProduct.getInput(),
             testCaseProduct.getOutput(),
             testCaseProduct.getVersion());
-    log.info("Test result for testCase " + testCaseProduct.getId() + ": " + type);
-
     testResultProducer.returnResult(type, testCaseProduct.getId());
   }
 }
