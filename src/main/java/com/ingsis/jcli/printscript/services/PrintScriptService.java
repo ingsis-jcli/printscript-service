@@ -19,7 +19,6 @@ import edu.utils.DefaultRulesFactory;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
@@ -113,10 +112,23 @@ public class PrintScriptService {
     DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
     var defaultFormattingRules = rulesFactory.getDefaultFormattingRules();
 
-    List<RuleDto> rules =
-        defaultFormattingRules.entrySet().stream()
-            .map(rule -> new RuleDto(false, rule.getKey(), rule.getValue().getAsString()))
-            .collect(Collectors.toList());
+    List<RuleDto> rules = new ArrayList<>();
+
+    defaultFormattingRules
+        .entrySet()
+        .forEach(
+            entry -> {
+              String key = entry.getKey();
+              var value = entry.getValue();
+
+              if (value.isJsonPrimitive()) {
+                if (value.getAsJsonPrimitive().isNumber()) {
+                  rules.add(new RuleDto(false, key, value.getAsNumber().toString()));
+                } else {
+                  rules.add(new RuleDto(false, key, null));
+                }
+              }
+            });
 
     return rules;
   }
@@ -125,12 +137,14 @@ public class PrintScriptService {
     DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
     var defaultLintingRules = rulesFactory.getDefaultLintingRules();
     List<RuleDto> rules = new ArrayList<>();
+
     defaultLintingRules
         .entrySet()
         .forEach(
             entry -> {
               String key = entry.getKey();
               var value = entry.getValue();
+
               if (value.isJsonArray()) {
                 value
                     .getAsJsonArray()
@@ -139,9 +153,16 @@ public class PrintScriptService {
                           rules.add(new RuleDto(false, key, element.getAsString()));
                         });
               } else {
-                rules.add(new RuleDto(false, key, value.getAsString()));
+                if (value.isJsonPrimitive()) {
+                  if (value.getAsJsonPrimitive().isNumber()) {
+                    rules.add(new RuleDto(false, key, value.getAsNumber().toString()));
+                  } else {
+                    rules.add(new RuleDto(false, key, null));
+                  }
+                }
               }
             });
+
     return rules;
   }
 

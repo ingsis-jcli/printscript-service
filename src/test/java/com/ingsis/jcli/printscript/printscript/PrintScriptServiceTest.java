@@ -131,15 +131,11 @@ public class PrintScriptServiceTest {
     assertTrue(
         rules.stream()
             .anyMatch(
-                rule ->
-                    rule.name().equals("declaration_space_before_colon")
-                        && rule.value().equals("false")));
+                rule -> rule.name().equals("declaration_space_before_colon") && !rule.isActive()));
     assertTrue(
         rules.stream()
             .anyMatch(
-                rule ->
-                    rule.name().equals("assignment_space_after_equals")
-                        && rule.value().equals("false")));
+                rule -> rule.name().equals("assignment_space_after_equals") && !rule.isActive()));
   }
 
   @Test
@@ -165,6 +161,6 @@ public class PrintScriptServiceTest {
             .anyMatch(
                 rule ->
                     rule.name().equals("mandatory-variable-or-literal-in-println")
-                        && rule.value().equals("false")));
+                        && !rule.isActive()));
   }
 }
