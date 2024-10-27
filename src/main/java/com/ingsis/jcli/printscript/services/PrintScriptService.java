@@ -1,6 +1,6 @@
 package com.ingsis.jcli.printscript.services;
 
-import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getJsonRules;
+import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getJsonLintingRules;
 import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.reportToString;
 
 import com.google.gson.JsonObject;
@@ -39,7 +39,7 @@ public class PrintScriptService {
 
   public String format(String name, String url, List<RuleDto> config, String version) {
     InputStream code = snippetsService.getSnippetStream(name, url);
-    JsonObject rules = getJsonRules(config);
+    JsonObject rules = getJsonLintingRules(config); // TODO GET JSON FORMATTING RULES
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);
     }
@@ -49,7 +49,8 @@ public class PrintScriptService {
   }
 
   public String analyze(String name, String url, List<RuleDto> rules, String version) {
-    JsonObject rulesJson = getJsonRules(rules);
+    JsonObject rulesJson = getJsonLintingRules(rules);
+    System.out.println("Json Rules: " + rulesJson);
     InputStream code = snippetsService.getSnippetStream(name, url);
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);

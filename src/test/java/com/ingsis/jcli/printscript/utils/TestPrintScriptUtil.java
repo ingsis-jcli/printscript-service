@@ -37,7 +37,7 @@ class TestPrintScriptUtil {
     RuleDto activeRule2 = new RuleDto(true, "rule3", "value3");
     List<RuleDto> rules = Arrays.asList(activeRule1, inactiveRule, activeRule2);
 
-    JsonObject jsonRules = PrintScriptUtil.getJsonRules(rules);
+    JsonObject jsonRules = PrintScriptUtil.getJsonLintingRules(rules);
 
     assertTrue(jsonRules.has("rule1"), "JSON should have active rule1");
     assertTrue(jsonRules.has("rule3"), "JSON should have active rule3");

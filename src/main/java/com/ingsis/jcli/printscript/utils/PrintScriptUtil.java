@@ -13,11 +13,16 @@ public class PrintScriptUtil {
     return new ByteArrayInputStream(snippet.getBytes());
   }
 
-  public static JsonObject getJsonRules(List<RuleDto> rules) {
+  public static JsonObject getJsonLintingRules(List<RuleDto> rules) {
     JsonObject jsonObject = new JsonObject();
+
     for (RuleDto rule : rules) {
       if (rule.isActive()) {
-        jsonObject.addProperty(rule.name(), rule.value());
+        if (rule.value() != null) {
+          jsonObject.addProperty(rule.name(), rule.value());
+        } else {
+          jsonObject.addProperty(rule.name(), true);
+        }
       }
     }
     return jsonObject;

@@ -51,8 +51,11 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
       log.error("Received null lint request, check the serialization and JSON structure");
       return;
     }
-    log.info("Processing format request: " + lintRequest);
+    log.info("Processing lint request: " + lintRequest);
     LintOrFormatRequestProduct lintRequestProduct = deserializeIntoRequestProduct(lintRequest);
+
+    System.out.println("Linting rules: " + lintRequestProduct.getRules());
+
     String result =
         printScriptService.analyze(
             lintRequestProduct.getName(),
