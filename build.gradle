@@ -40,8 +40,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'com.ingsis.jcli:runner:1.1.18'
-    implementation 'com.ingsis.jcli:interpreter:1.1.18'
+    implementation 'com.ingsis.jcli:runner:1.1.19'
 
     implementation 'com.ingsis.jcli:common:1.1.17'
     implementation 'com.google.code.gson:gson:2.8.9'

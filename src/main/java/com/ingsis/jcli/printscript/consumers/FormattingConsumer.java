@@ -53,11 +53,14 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
     }
     log.info("Processing testCase: " + formatRequest);
     LintOrFormatRequestProduct formatRequestProduct = deserializeIntoRequestProduct(formatRequest);
-    printScriptService.format(
-        formatRequestProduct.getName(),
-        formatRequestProduct.getUrl(),
-        formatRequestProduct.getRules(),
-        formatRequestProduct.getVersion());
+    String result =
+        printScriptService.format(
+            formatRequestProduct.getName(),
+            formatRequestProduct.getUrl(),
+            formatRequestProduct.getRules(),
+            formatRequestProduct.getVersion());
+
+    log.info("Result for snippetId " + formatRequestProduct.getSnippetId() + ": " + result);
 
     // TODO IMPLEMENT WHAT TO DO WITH RESULT
 

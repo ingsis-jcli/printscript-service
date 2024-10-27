@@ -17,6 +17,7 @@ import edu.Report;
 import edu.Runner;
 import edu.utils.DefaultRulesFactory;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -123,12 +124,24 @@ public class PrintScriptService {
   public List<RuleDto> getDefaultLintingRules(String version) {
     DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
     var defaultLintingRules = rulesFactory.getDefaultLintingRules();
-
-    List<RuleDto> rules =
-        defaultLintingRules.entrySet().stream()
-            .map(entry -> new RuleDto(false, entry.getKey(), entry.getValue().getAsString()))
-            .collect(Collectors.toList());
-
+    List<RuleDto> rules = new ArrayList<>();
+    defaultLintingRules
+        .entrySet()
+        .forEach(
+            entry -> {
+              String key = entry.getKey();
+              var value = entry.getValue();
+              if (value.isJsonArray()) {
+                value
+                    .getAsJsonArray()
+                    .forEach(
+                        element -> {
+                          rules.add(new RuleDto(false, key, element.getAsString()));
+                        });
+              } else {
+                rules.add(new RuleDto(false, key, value.getAsString()));
+              }
+            });
     return rules;
   }
 

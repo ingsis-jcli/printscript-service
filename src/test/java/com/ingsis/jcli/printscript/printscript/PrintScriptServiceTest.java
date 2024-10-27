@@ -2,8 +2,11 @@ package com.ingsis.jcli.printscript.printscript;
 
 import static com.ingsis.jcli.printscript.common.TestUtils.getStringFromFile;
 import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getInputStreamFromString;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import com.google.gson.JsonObject;
 import com.ingsis.jcli.printscript.clients.PermissionsClient;
 import com.ingsis.jcli.printscript.clients.SnippetsClient;
 import com.ingsis.jcli.printscript.common.FileType;
@@ -110,5 +113,58 @@ public class PrintScriptServiceTest {
 
     TestType type = printScriptService.runTestCase("test1", url, inputs, output, "1.1");
     assert type.equals(TestType.VALID);
+  }
+
+  @Test
+  void testGetDefaultFormattingRules() {
+    String version = "1.1";
+    DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
+
+    JsonObject defaultFormattingRules = rulesFactory.getDefaultFormattingRules();
+    when(defaultRulesFactory.getDefaultFormattingRules()).thenReturn(defaultFormattingRules);
+
+    List<RuleDto> rules = printScriptService.getDefaultFormattingRules(version);
+
+    assertNotNull(rules);
+    assertTrue(rules.size() > 0);
+
+    assertTrue(
+        rules.stream()
+            .anyMatch(
+                rule ->
+                    rule.name().equals("declaration_space_before_colon")
+                        && rule.value().equals("false")));
+    assertTrue(
+        rules.stream()
+            .anyMatch(
+                rule ->
+                    rule.name().equals("assignment_space_after_equals")
+                        && rule.value().equals("false")));
+  }
+
+  @Test
+  void testGetDefaultLintingRules() {
+    String version = "1.1";
+    DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
+
+    JsonObject defaultLintingRules = rulesFactory.getDefaultLintingRules();
+    when(defaultRulesFactory.getDefaultLintingRules()).thenReturn(defaultLintingRules);
+
+    List<RuleDto> rules = printScriptService.getDefaultLintingRules(version);
+
+    assertNotNull(rules);
+    assertTrue(rules.size() > 0);
+
+    assertTrue(
+        rules.stream()
+            .anyMatch(
+                rule ->
+                    rule.name().equals("identifier_format") && rule.value().equals("snake case")));
+    assertTrue(
+        rules.stream()
+            .anyMatch(
+                rule ->
+                    rule.name().equals("mandatory-variable-or-literal-in-println")
+                        && rule.value().equals("false")));
   }
 }

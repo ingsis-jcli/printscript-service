@@ -53,13 +53,15 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
     }
     log.info("Processing testCase: " + lintRequest);
     LintOrFormatRequestProduct lintRequestProduct = deserializeIntoRequestProduct(lintRequest);
-    printScriptService.analyze(
-        lintRequestProduct.getName(),
-        lintRequestProduct.getUrl(),
-        lintRequestProduct.getRules(),
-        lintRequestProduct.getVersion());
+    String result =
+        printScriptService.analyze(
+            lintRequestProduct.getName(),
+            lintRequestProduct.getUrl(),
+            lintRequestProduct.getRules(),
+            lintRequestProduct.getVersion());
 
     // TODO IMPLEMENT WHAT TO DO WITH RESULT
 
+    log.info("Result for snippetId " + lintRequestProduct.getSnippetId() + ": " + result);
   }
 }
