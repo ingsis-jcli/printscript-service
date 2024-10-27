@@ -1,5 +1,9 @@
 package com.ingsis.jcli.printscript.consumers;
 
+import static com.ingsis.jcli.printscript.consumers.DeserializerUtil.deserializeIntoRequestProduct;
+
+import com.ingsis.jcli.printscript.common.Generated;
+import com.ingsis.jcli.printscript.consumers.products.LintOrFormatRequestProduct;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamReceiver;
 import org.springframework.stereotype.Component;
 
+@Generated
 @Profile("!test")
 @Slf4j
 @Component
@@ -41,28 +46,20 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
 
   @Override
   protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
-    String snippetId = objectRecord.getValue();
-    log.info("Processing snippet: " + snippetId);
-    System.out.println("Processing snippet: " + snippetId);
-    //    FormatRequest formatRequest = deserializeFormatRequest(objectRecord.getValue());
-    //    SnippetDto snippet = formatRequest.snippetDto();
-    //    List<Rule> rules = formatRequest.ruleList();
-    //
-    //    String rulesConfig = convertRulesToConfig(rules);
-    //    String result = printScriptService.format(snippet.getContent(), rulesConfig,
-    // snippet.getVersion());
-    //    log.info("Format result for snippet " + snippetId + ": " + result);
+    String formatRequest = objectRecord.getValue();
+    if (formatRequest == null) {
+      log.error("Received null format request, check the serialization and JSON structure");
+      return;
+    }
+    log.info("Processing testCase: " + formatRequest);
+    LintOrFormatRequestProduct formatRequestProduct = deserializeIntoRequestProduct(formatRequest);
+    printScriptService.format(
+        formatRequestProduct.getName(),
+        formatRequestProduct.getUrl(),
+        formatRequestProduct.getRules(),
+        formatRequestProduct.getVersion());
+
+    // TODO IMPLEMENT WHAT TO DO WITH RESULT
+
   }
-
-  //  private String convertRulesToConfig(List<Rule> rules) {
-  //    JsonObject rulesJson = new JsonObject();
-  //    for (Rule rule : rules) {
-  //      rulesJson.addProperty(rule.getName(), rule.getValue());
-  //    }
-  //    return rulesJson.toString();
-  //  }
-
-  //  private FormatRequest deserializeFormatRequest(String message) {
-  //    return new Gson().fromJson(message, FormatRequest.class);
-  //  }
 }

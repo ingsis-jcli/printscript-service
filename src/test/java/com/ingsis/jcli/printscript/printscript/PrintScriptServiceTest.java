@@ -12,6 +12,7 @@ import com.ingsis.jcli.printscript.common.requests.RuleDto;
 import com.ingsis.jcli.printscript.common.responses.TestType;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import com.ingsis.jcli.printscript.services.SnippetsService;
+import edu.utils.DefaultRulesFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,13 +23,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class PrintScriptServiceTest {
+
   @Mock private SnippetsClient snippetsClient;
-
   @Mock private PermissionsClient permissionsClient;
-
   @InjectMocks private PrintScriptService printScriptService;
-
   @Mock private SnippetsService snippetsService;
+  @Mock private DefaultRulesFactory defaultRulesFactory;
 
   @BeforeEach
   void setUp() {
@@ -57,6 +57,7 @@ public class PrintScriptServiceTest {
 
   @Test
   void testAnalyze() {
+    String url = "/analyze";
     Map<String, List<RuleDto>> testCases =
         Map.of(
             "test1", List.of(),
@@ -64,16 +65,16 @@ public class PrintScriptServiceTest {
                 List.of(
                     new RuleDto(true, "identifier_format", "camel case"),
                     new RuleDto(true, "mandatory-variable-or-literal-in-readInput", "true")));
-    String url = "/analyze";
+
     for (Map.Entry<String, List<RuleDto>> testCase : testCases.entrySet()) {
       Optional<String> input =
           getStringFromFile(OperationType.ANALYZE, testCase.getKey(), FileType.INPUT);
       Optional<String> expected =
           getStringFromFile(OperationType.ANALYZE, testCase.getKey(), FileType.OUTPUT);
-      Optional<String> rules =
-          getStringFromFile(OperationType.ANALYZE, testCase.getKey(), FileType.RULES);
+
       when(snippetsService.getSnippetStream(testCase.getKey(), url))
           .thenReturn(getInputStreamFromString(input.get()));
+
       String output =
           printScriptService.analyze(testCase.getKey(), url, testCase.getValue(), "1.1");
       assert output.equals(expected.get());
@@ -88,8 +89,10 @@ public class PrintScriptServiceTest {
       Optional<String> input = getStringFromFile(OperationType.EXECUTE, caseName, FileType.INPUT);
       Optional<String> expected =
           getStringFromFile(OperationType.EXECUTE, caseName, FileType.OUTPUT);
+
       when(snippetsService.getSnippetStream(caseName, url))
           .thenReturn(getInputStreamFromString(input.get()));
+
       String output = printScriptService.execute(caseName, url, "1.1");
       assert output.equals(expected.get());
     }
@@ -101,10 +104,11 @@ public class PrintScriptServiceTest {
     List<String> inputs = List.of("1");
     List<String> output = List.of("3");
     Optional<String> code = getStringFromFile(OperationType.TEST, "test1", FileType.INPUT);
+
     when(snippetsService.getSnippetStream("test1", url))
         .thenReturn(getInputStreamFromString(code.get()));
+
     TestType type = printScriptService.runTestCase("test1", url, inputs, output, "1.1");
-    System.out.println("TYPE: " + type);
     assert type.equals(TestType.VALID);
   }
 }

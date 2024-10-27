@@ -2,8 +2,9 @@ package com.ingsis.jcli.printscript.consumers;
 
 import static com.ingsis.jcli.printscript.consumers.DeserializerUtil.deserializeIntoTestCase;
 
-import com.ingsis.jcli.printscript.common.responses.TestCaseProduct;
+import com.ingsis.jcli.printscript.common.Generated;
 import com.ingsis.jcli.printscript.common.responses.TestType;
+import com.ingsis.jcli.printscript.consumers.products.TestCaseProduct;
 import com.ingsis.jcli.printscript.producers.TestResultProducer;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
@@ -18,6 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamReceiver;
 import org.springframework.stereotype.Component;
 
+@Generated
 @Profile("!test")
 @Slf4j
 @Component

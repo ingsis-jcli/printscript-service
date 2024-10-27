@@ -1,9 +1,11 @@
 package com.ingsis.jcli.printscript.producers;
 
+import com.ingsis.jcli.printscript.common.Generated;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
 
+@Generated
 public abstract class JavaRedisStreamProducer {
   private final String streamKey;
   private final RedisTemplate<String, String> redis;

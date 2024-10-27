@@ -1,6 +1,9 @@
 package com.ingsis.jcli.printscript.consumers;
 
-import com.ingsis.jcli.printscript.consumers.requests.PendingSnippetLint;
+import static com.ingsis.jcli.printscript.consumers.DeserializerUtil.deserializeIntoRequestProduct;
+
+import com.ingsis.jcli.printscript.common.Generated;
+import com.ingsis.jcli.printscript.consumers.products.LintOrFormatRequestProduct;
 import com.ingsis.jcli.printscript.services.PrintScriptService;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +17,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamReceiver;
 import org.springframework.stereotype.Component;
 
+@Generated
 @Profile("!test")
 @Slf4j
 @Component
-public class LintingConsumer extends RedisStreamConsumer<PendingSnippetLint> {
+public class LintingConsumer extends RedisStreamConsumer<String> {
 
   private final PrintScriptService printScriptService;
 
@@ -33,26 +37,29 @@ public class LintingConsumer extends RedisStreamConsumer<PendingSnippetLint> {
 
   @NotNull
   @Override
-  protected StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, PendingSnippetLint>>
-      options() {
+  protected StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, String>> options() {
     return StreamReceiver.StreamReceiverOptions.builder()
         .pollTimeout(Duration.ofMillis(10000))
-        .targetType(PendingSnippetLint.class)
+        .targetType(String.class)
         .build();
   }
 
   @Override
-  protected void onMessage(@NotNull ObjectRecord<String, PendingSnippetLint> objectRecord) {
-    PendingSnippetLint snippetLint = objectRecord.getValue();
-    log.info("Processing snippet message: ");
-    System.out.println(
-        "Processing snippet: "
-            + snippetLint.name()
-            + " at "
-            + snippetLint.url()
-            + " with rules: "
-            + snippetLint.rules());
+  protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
+    String lintRequest = objectRecord.getValue();
+    if (lintRequest == null) {
+      log.error("Received null lint request, check the serialization and JSON structure");
+      return;
+    }
+    log.info("Processing testCase: " + lintRequest);
+    LintOrFormatRequestProduct lintRequestProduct = deserializeIntoRequestProduct(lintRequest);
     printScriptService.analyze(
-        snippetLint.name(), snippetLint.url(), snippetLint.rules(), snippetLint.version());
+        lintRequestProduct.getName(),
+        lintRequestProduct.getUrl(),
+        lintRequestProduct.getRules(),
+        lintRequestProduct.getVersion());
+
+    // TODO IMPLEMENT WHAT TO DO WITH RESULT
+
   }
 }

@@ -2,7 +2,9 @@ package com.ingsis.jcli.printscript.printscript;
 
 import static com.ingsis.jcli.printscript.common.TestUtils.getStringFromFile;
 import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getInputStreamFromString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -200,5 +202,45 @@ public class PrintScriptControllerTest {
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
         .andExpect(status().isOk())
         .andExpect(content().string("\"" + TestType.VALID.toString() + "\""));
+  }
+
+  @Test
+  void testGetFormattingRules() throws Exception {
+    String version = "1.1";
+    List<RuleDto> rules =
+        List.of(
+            new RuleDto(true, "declaration_space_before_colon", "true"),
+            new RuleDto(true, "declaration_space_after_colon", "true"));
+
+    when(printScriptService.getDefaultFormattingRules(anyString())).thenReturn(rules);
+
+    mockMvc
+        .perform(
+            get("/formatting_rules")
+                .param("version", version)
+                .with(SecurityMockMvcRequestPostProcessors.jwt()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(content().json(asJsonString(rules)));
+  }
+
+  @Test
+  void testGetLintingRules() throws Exception {
+    String version = "1.1";
+    List<RuleDto> rules =
+        List.of(
+            new RuleDto(true, "no_console_log", "true"),
+            new RuleDto(false, "max_line_length", "80"));
+
+    when(printScriptService.getDefaultLintingRules(anyString())).thenReturn(rules);
+
+    mockMvc
+        .perform(
+            get("/linting_rules")
+                .param("version", version)
+                .with(SecurityMockMvcRequestPostProcessors.jwt()))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(content().json(asJsonString(rules)));
   }
 }

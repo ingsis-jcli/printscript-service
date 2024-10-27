@@ -1,5 +1,6 @@
 package com.ingsis.jcli.printscript.advice;
 
+import com.ingsis.jcli.printscript.common.Generated;
 import com.ingsis.jcli.printscript.common.exceptions.SnippetNotFoundException;
 import com.ingsis.jcli.printscript.common.exceptions.VersionNotValid;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 
+@Generated
 @ControllerAdvice
 public class GlobalExceptionHandler {
 

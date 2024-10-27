@@ -1,5 +1,6 @@
 package com.ingsis.jcli.printscript.auth0;
 
+import com.ingsis.jcli.printscript.common.Generated;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+@Generated
 @Component
 public class AuthFeignInterceptor implements RequestInterceptor {
 
