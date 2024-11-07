@@ -158,12 +158,8 @@ public class PrintScriptService {
               var value = entry.getValue();
 
               if (value.isJsonArray()) {
-                value
-                    .getAsJsonArray()
-                    .forEach(
-                        element -> {
-                          rules.add(new RuleDto(false, key, element.getAsString()));
-                        });
+                String defaultValue = value.getAsJsonArray().get(0).getAsString();
+                rules.add(new RuleDto(false, key, defaultValue));
               } else {
                 if (value.isJsonPrimitive()) {
                   if (value.getAsJsonPrimitive().isNumber()) {
