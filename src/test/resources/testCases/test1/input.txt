@@ -1,2 +1,2 @@
 let a : number = readInput("Enter a " + "number: ");
-println(number+ 2);
+println(a+ 2);
