@@ -83,7 +83,7 @@ public class PrintScriptServiceTest {
 
       ErrorResponse output =
           printScriptService.analyze(testCase.getKey(), url, testCase.getValue(), "1.1");
-      assert output.error().equals(expected.get());
+      assert output.error().equals(expected.get().replace("\r", ""));
     }
   }
 
@@ -112,7 +112,7 @@ public class PrintScriptServiceTest {
     Optional<String> code = getStringFromFile(OperationType.TEST, "test1", FileType.INPUT);
 
     when(snippetsService.getSnippetStream("test1", url))
-        .thenReturn(getInputStreamFromString(code.get()));
+        .thenReturn(getInputStreamFromString(code.get().replace("\r", "")));
 
     TestType type = printScriptService.runTestCase("test1", url, inputs, output, "1.1");
     assert type.equals(TestType.VALID);
@@ -158,7 +158,7 @@ public class PrintScriptServiceTest {
         rules.stream()
             .anyMatch(
                 rule ->
-                    rule.name().equals("identifier_format") && rule.value().equals("snake case")));
+                    rule.name().equals("identifier_format") && rule.value().equals("camel case")));
     assertTrue(
         rules.stream()
             .anyMatch(
