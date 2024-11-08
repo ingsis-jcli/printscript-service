@@ -32,6 +32,11 @@ public class SnippetsService {
     throw new SnippetNotFoundException(name, container);
   }
 
+  public void updateSnippetInBucket(String content, String name, String container) {
+    bucketClient.deleteSnippet(container, name);
+    bucketClient.saveSnippet(container, name, content);
+  }
+
   public InputStream getSnippetStreamFromString(String snippet) {
     return getInputStreamFromString(snippet);
   }

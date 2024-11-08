@@ -49,10 +49,8 @@ public class PrintScriptService {
     }
     Runner runner = new Runner(version);
     FormatterResult result = runner.format(code, rules);
-    if (result.getResult().equals(original)) {
-      return new FormatResponse(original, ProcessStatus.COMPLIANT);
-    }
-    return new FormatResponse(result.getResult(), ProcessStatus.NON_COMPLIANT);
+    snippetsService.updateSnippetInBucket(result.getResult(), name, url);
+    return new FormatResponse(result.getResult(), ProcessStatus.COMPLIANT);
   }
 
   public ErrorResponse analyze(String name, String url, List<RuleDto> rules, String version) {
