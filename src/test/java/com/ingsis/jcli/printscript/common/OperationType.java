@@ -4,7 +4,8 @@ public enum OperationType {
   EXECUTE("interpreter"),
   FORMAT("formatter"),
   ANALYZE("analyzer"),
-  VALIDATE("validator");
+  VALIDATE("validator"),
+  TEST("testCases");
 
   public final String name;
 

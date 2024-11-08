@@ -1,3 +1,8 @@
 package com.ingsis.jcli.printscript.common.requests;
 
-public record ExecuteRequest(String snippet, String version) {}
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record ExecuteRequest(
+    @JsonProperty("name") String name,
+    @JsonProperty("url") String url,
+    @JsonProperty("version") String version) {}

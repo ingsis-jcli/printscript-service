@@ -31,19 +31,6 @@ def loadEnv() {
 
 loadEnv()
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/JulietaG13/PrintScript")
-        credentials {
-            username = System.getenv('USERNAME') ?: project.GITHUB_ACTOR
-            password = System.getenv('TOKEN') ?: project.GITHUB_TOKEN
-        }
-    }
-}
-
 ext {
     set('springCloudVersion', "2023.0.3") // for openfeign
 }
@@ -53,8 +40,9 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'com.ingsis.jcli:runner:1.1.13'
-    implementation 'com.ingsis.jcli:common:1.1.13'
+    implementation 'com.ingsis.jcli:runner:1.1.19'
+
+    implementation 'com.ingsis.jcli:common:1.1.17'
     implementation 'com.google.code.gson:gson:2.8.9'
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
@@ -64,6 +52,19 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // Redis MVC Library
+    implementation 'org.austral.ingsis:redis-streams-mvc:0.1.13'
+    implementation 'org.springframework.data:spring-data-redis:3.1.0'
+
+    // Redis reactive
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Jackson Dependencies
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.14.0'
+
 }
 
 dependencyManagement {  // for openfeign
@@ -123,3 +124,5 @@ spotless {
         ktlint()
     }
 }
+
+apply from: 'gradle/repositories.gradle'

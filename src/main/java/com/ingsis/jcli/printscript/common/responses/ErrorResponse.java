@@ -1,3 +1,5 @@
 package com.ingsis.jcli.printscript.common.responses;
 
-public record ErrorResponse(String error) {}
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record ErrorResponse(@JsonProperty("error") String error) {}

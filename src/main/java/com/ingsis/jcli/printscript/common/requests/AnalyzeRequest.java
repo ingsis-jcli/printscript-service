@@ -1,3 +1,10 @@
 package com.ingsis.jcli.printscript.common.requests;
 
-public record AnalyzeRequest(String snippet, String config, String version) {}
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+
+public record AnalyzeRequest(
+    @JsonProperty("name") String name,
+    @JsonProperty("url") String url,
+    @JsonProperty("rules") List<RuleDto> rules,
+    @JsonProperty("version") String version) {}

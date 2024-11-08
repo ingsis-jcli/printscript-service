@@ -1,60 +1,79 @@
 package com.ingsis.jcli.printscript.services;
 
-import static com.ingsis.jcli.printscript.common.PrintScriptUtil.getInputStreamFromString;
-import static com.ingsis.jcli.printscript.common.PrintScriptUtil.getJsonRules;
-import static com.ingsis.jcli.printscript.common.PrintScriptUtil.reportToString;
+import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getJsonFormattingRules;
+import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.getJsonLintingRules;
+import static com.ingsis.jcli.printscript.utils.PrintScriptUtil.reportToString;
 
 import com.google.gson.JsonObject;
-import com.ingsis.jcli.printscript.common.ConsoleResult;
-import com.ingsis.jcli.printscript.common.PrintAccumulator;
-import com.ingsis.jcli.printscript.common.UiInputProvider;
+import com.ingsis.jcli.printscript.common.exceptions.VersionNotValid;
+import com.ingsis.jcli.printscript.common.requests.RuleDto;
 import com.ingsis.jcli.printscript.common.responses.ErrorResponse;
+import com.ingsis.jcli.printscript.common.responses.FormatResponse;
+import com.ingsis.jcli.printscript.common.responses.ProcessStatus;
+import com.ingsis.jcli.printscript.common.responses.TestType;
+import com.ingsis.jcli.printscript.utils.ConsoleResult;
+import com.ingsis.jcli.printscript.utils.PrintAccumulator;
+import com.ingsis.jcli.printscript.utils.TestInputProvider;
+import com.ingsis.jcli.printscript.utils.UiInputProvider;
 import edu.FormatterResult;
 import edu.Report;
 import edu.Runner;
+import edu.utils.DefaultRulesFactory;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class PrintScriptService {
   private final List<String> availableVersions;
+  private final SnippetsService snippetsService;
 
-  public PrintScriptService() {
+  @Autowired
+  public PrintScriptService(SnippetsService snippetsService) {
     this.availableVersions = List.of("1.0", "1.1");
+    this.snippetsService = snippetsService;
   }
 
-  public String format(String snippet, String config, String version) {
-    InputStream code = getInputStreamFromString(snippet);
-    JsonObject rules = getJsonRules(config);
+  public FormatResponse format(String name, String url, List<RuleDto> config, String version) {
+    String original = snippetsService.getSnippetString(name, url);
+    InputStream code = snippetsService.getSnippetStreamFromString(original);
+    JsonObject rules = getJsonFormattingRules(config);
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);
     }
     Runner runner = new Runner(version);
     FormatterResult result = runner.format(code, rules);
-    return result.getResult();
+    snippetsService.updateSnippetInBucket(result.getResult(), name, url);
+    return new FormatResponse(result.getResult(), ProcessStatus.COMPLIANT);
   }
 
-  public String analyze(String snippet, String config, String version) {
-    InputStream code = getInputStreamFromString(snippet);
-    JsonObject rules = getJsonRules(config);
+  public ErrorResponse analyze(String name, String url, List<RuleDto> rules, String version) {
+    JsonObject rulesJson = getJsonLintingRules(rules);
+    System.out.println("Json Linting Rules: " + rulesJson);
+    InputStream code = snippetsService.getSnippetStream(name, url);
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);
     }
     Runner runner = new Runner(version);
-    Report result = runner.analyze(code, rules);
-    return reportToString(result);
+    Report result = runner.analyze(code, rulesJson);
+    if (result.getReport().isEmpty()) {
+      return new ErrorResponse("");
+    }
+    return new ErrorResponse(reportToString(result));
   }
 
-  public String execute(String snippet, String version) {
-    InputStream code = getInputStreamFromString(snippet);
+  public String execute(String name, String url, String version) {
+    InputStream code = snippetsService.getSnippetStream(name, url);
     ConsoleResult consoleResult = new ConsoleResult();
     PrintAccumulator printAccumulator = new PrintAccumulator(consoleResult);
     UiInputProvider uiInputProvider = new UiInputProvider(printAccumulator);
+    // TODO RECEIVE LIVE EXECUTION
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);
     }
@@ -68,11 +87,11 @@ public class PrintScriptService {
     }
   }
 
-  public ErrorResponse validate(String snippet, String version) {
+  public ErrorResponse validate(String name, String url, String version) {
     Marker marker = MarkerFactory.getMarker("Validate");
-    log.info(marker, "Validating snippet: " + snippet);
-
-    InputStream code = getInputStreamFromString(snippet);
+    log.info(marker, "Looking for snippet with name: " + name);
+    log.info(marker, "Looking for snippet at container: " + url);
+    InputStream code = snippetsService.getSnippetStream(name, url);
     ConsoleResult consoleResult = new ConsoleResult();
 
     if (!availableVersions.contains(version)) {
@@ -85,7 +104,7 @@ public class PrintScriptService {
 
     try {
       runner.validate(code);
-      log.info(marker, "Validated snippet: " + snippet);
+      log.info(marker, "Validated snippet: " + name);
 
       if (consoleResult.getResult() == null || consoleResult.getResult().isBlank()) {
         return new ErrorResponse("");
@@ -96,5 +115,99 @@ public class PrintScriptService {
       consoleResult.append(e.getMessage());
       return new ErrorResponse(consoleResult.getResult());
     }
+  }
+
+  public List<RuleDto> getDefaultFormattingRules(String version) {
+    DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
+    var defaultFormattingRules = rulesFactory.getDefaultFormattingRules();
+
+    List<RuleDto> rules = new ArrayList<>();
+
+    defaultFormattingRules
+        .entrySet()
+        .forEach(
+            entry -> {
+              String key = entry.getKey();
+              var value = entry.getValue();
+
+              if (value.isJsonPrimitive()) {
+                if (value.getAsJsonPrimitive().isNumber()) {
+                  int intValue = value.getAsInt();
+                  rules.add(new RuleDto(false, key, String.valueOf(intValue)));
+                } else {
+                  rules.add(new RuleDto(false, key, null));
+                }
+              }
+            });
+
+    return rules;
+  }
+
+  public List<RuleDto> getDefaultLintingRules(String version) {
+    DefaultRulesFactory rulesFactory = new DefaultRulesFactory(version);
+    var defaultLintingRules = rulesFactory.getDefaultLintingRules();
+    List<RuleDto> rules = new ArrayList<>();
+
+    defaultLintingRules
+        .entrySet()
+        .forEach(
+            entry -> {
+              String key = entry.getKey();
+              var value = entry.getValue();
+
+              if (value.isJsonArray()) {
+                String defaultValue = value.getAsJsonArray().get(0).getAsString();
+                rules.add(new RuleDto(false, key, defaultValue));
+              } else {
+                if (value.isJsonPrimitive()) {
+                  if (value.getAsJsonPrimitive().isNumber()) {
+                    rules.add(new RuleDto(false, key, value.getAsNumber().toString()));
+                  } else {
+                    rules.add(new RuleDto(false, key, null));
+                  }
+                }
+              }
+            });
+
+    return rules;
+  }
+
+  public TestType runTestCase(
+      String name, String url, List<String> inputs, List<String> expectedOutputs, String version) {
+    InputStream code = snippetsService.getSnippetStream(name, url);
+
+    if (!availableVersions.contains(version)) {
+      throw new VersionNotValid(version);
+    }
+
+    ConsoleResult consoleResult = new ConsoleResult();
+    PrintAccumulator printAccumulator = new PrintAccumulator(consoleResult);
+    TestInputProvider uiInputProvider = new TestInputProvider(printAccumulator, inputs);
+
+    Runner runner = new Runner(version);
+    try {
+      runner.execute(code, uiInputProvider, printAccumulator);
+    } catch (Exception e) {
+      consoleResult.append(e.getMessage());
+      return TestType.INVALID;
+    }
+
+    List<String> prints = printAccumulator.getPrints();
+
+    return compareOutputs(prints, expectedOutputs);
+  }
+
+  private TestType compareOutputs(List<String> outputs, List<String> expectedOutputs) {
+    if (outputs.size() != expectedOutputs.size()) {
+      return TestType.INVALID;
+    }
+
+    for (int i = 0; i < outputs.size(); i++) {
+      if (!outputs.get(i).equals(expectedOutputs.get(i))) {
+        return TestType.INVALID;
+      }
+    }
+
+    return TestType.VALID;
   }
 }
