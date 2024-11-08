@@ -122,5 +122,4 @@ public class PrintScriptController {
     return new ResponseEntity<>(testType, HttpStatus.OK);
   }
 
-  // TODO: format from string directly (request: string, response: string)
 }

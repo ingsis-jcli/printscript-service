@@ -17,7 +17,6 @@ public class TestInputProvider implements InputProvider {
 
   @Override
   public String input(String message) {
-    // TODO: check if the message should be printed in test cases
     return inputs.poll();
   }
 }

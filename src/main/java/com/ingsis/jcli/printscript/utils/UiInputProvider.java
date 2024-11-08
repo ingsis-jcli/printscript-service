@@ -13,7 +13,6 @@ public class UiInputProvider implements InputProvider {
   @Override
   public String input(String s) {
     printEmitter.print(s);
-    // TODO : implement live execution
     return "";
   }
 }
