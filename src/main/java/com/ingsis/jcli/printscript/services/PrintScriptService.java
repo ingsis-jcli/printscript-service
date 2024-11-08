@@ -73,7 +73,6 @@ public class PrintScriptService {
     ConsoleResult consoleResult = new ConsoleResult();
     PrintAccumulator printAccumulator = new PrintAccumulator(consoleResult);
     UiInputProvider uiInputProvider = new UiInputProvider(printAccumulator);
-    // TODO RECEIVE LIVE EXECUTION
     if (!availableVersions.contains(version)) {
       throw new IllegalArgumentException("Invalid version: " + version);
     }
