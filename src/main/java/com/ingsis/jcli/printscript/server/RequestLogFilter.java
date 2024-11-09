@@ -1,4 +1,4 @@
-package com.ingsis.jcli.printscript;
+package com.ingsis.jcli.printscript.server;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

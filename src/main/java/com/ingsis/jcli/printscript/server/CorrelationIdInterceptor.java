@@ -1,8 +1,8 @@
-package com.ingsis.jcli.printscript;
+package com.ingsis.jcli.printscript.server;
 
 
-import static com.ingsis.jcli.printscript.CorrelationIdFilter.CORRELATION_ID_HEADER;
-import static com.ingsis.jcli.printscript.CorrelationIdFilter.CORRELATION_ID_KEY;
+import static com.ingsis.jcli.printscript.server.CorrelationIdFilter.CORRELATION_ID_HEADER;
+import static com.ingsis.jcli.printscript.server.CorrelationIdFilter.CORRELATION_ID_KEY;
 
 import java.io.IOException;
 import org.slf4j.MDC;

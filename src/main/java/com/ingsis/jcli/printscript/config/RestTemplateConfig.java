@@ -1,6 +1,6 @@
 package com.ingsis.jcli.printscript.config;
 
-import com.ingsis.jcli.printscript.CorrelationIdInterceptor;
+import com.ingsis.jcli.printscript.server.CorrelationIdInterceptor;
 import com.ingsis.jcli.printscript.auth0.Auth0RestTemplateInterceptor;
 import java.util.ArrayList;
 import java.util.List;
