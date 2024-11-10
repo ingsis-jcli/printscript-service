@@ -20,7 +20,7 @@ public class SnippetsService {
   }
 
   public Optional<String> getSnippet(String name, String container) {
-    String snippet = bucketClient.getSnippet(name, container);
+    String snippet = bucketClient.getSnippet(formatName(name), container);
     return Optional.ofNullable(snippet);
   }
 
@@ -33,8 +33,8 @@ public class SnippetsService {
   }
 
   public void updateSnippetInBucket(String content, String name, String container) {
-    bucketClient.deleteSnippet(container, name);
-    bucketClient.saveSnippet(container, name, content);
+    bucketClient.deleteSnippet(container, formatName(name));
+    bucketClient.saveSnippet(container, formatName(name), content);
   }
 
   public InputStream getSnippetStreamFromString(String snippet) {
@@ -47,5 +47,9 @@ public class SnippetsService {
       return getInputStreamFromString(content.get());
     }
     throw new SnippetNotFoundException(name, container);
+  }
+
+  private String formatName(String name) {
+    return name.replaceAll("[\\s-]+", "");
   }
 }
