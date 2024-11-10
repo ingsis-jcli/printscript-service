@@ -1,7 +1,7 @@
 package com.ingsis.jcli.printscript.config;
 
-import com.ingsis.jcli.printscript.server.CorrelationIdInterceptor;
 import com.ingsis.jcli.printscript.auth0.Auth0RestTemplateInterceptor;
+import com.ingsis.jcli.printscript.server.CorrelationIdInterceptor;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
