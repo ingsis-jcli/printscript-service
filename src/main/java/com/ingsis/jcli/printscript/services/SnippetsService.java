@@ -6,6 +6,8 @@ import com.ingsis.jcli.printscript.clients.BucketRestClient;
 import com.ingsis.jcli.printscript.clients.factories.BucketRestTemplateFactory;
 import com.ingsis.jcli.printscript.common.exceptions.SnippetNotFoundException;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +52,6 @@ public class SnippetsService {
   }
 
   private String formatName(String name) {
-    return name.replaceAll("[\\s-]+", "");
+    return URLEncoder.encode(name, StandardCharsets.UTF_8);
   }
 }
