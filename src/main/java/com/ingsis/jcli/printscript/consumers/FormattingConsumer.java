@@ -51,22 +51,23 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
 
   @Override
   protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
-    String formatRequest = objectRecord.getValue();
-    if (formatRequest == null) {
-      return;
+    try {
+      String formatRequest = objectRecord.getValue();
+      
+      log.info("Received FormatRequest value: {}", formatRequest);
+      
+      LintOrFormatRequestProduct formatRequestProduct = deserializeIntoRequestProduct(formatRequest);
+      FormatResponse result =
+          printScriptService.format(
+              formatRequestProduct.getName(),
+              formatRequestProduct.getUrl(),
+              formatRequestProduct.getRules(),
+              formatRequestProduct.getVersion());
+      
+      snippetStatusUpdateProducer.updateStatus(
+          formatRequestProduct.getSnippetId(), "format", result.status());
+    } catch (Exception e) {
+      log.error("Error processing message: {}", e.getMessage(), e);
     }
-
-    log.info("Received FormatRequest value: {}", formatRequest);
-
-    LintOrFormatRequestProduct formatRequestProduct = deserializeIntoRequestProduct(formatRequest);
-    FormatResponse result =
-        printScriptService.format(
-            formatRequestProduct.getName(),
-            formatRequestProduct.getUrl(),
-            formatRequestProduct.getRules(),
-            formatRequestProduct.getVersion());
-
-    snippetStatusUpdateProducer.updateStatus(
-        formatRequestProduct.getSnippetId(), "format", result.status());
   }
 }
