@@ -19,6 +19,7 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamReceiver;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Generated
 @Profile("!test")
@@ -47,6 +48,10 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
     return StreamReceiver.StreamReceiverOptions.builder()
         .pollTimeout(Duration.ofMillis(10000))
         .targetType(String.class)
+        .onErrorResume(e -> {
+          log.error("(LintingConsumer) Error occurred while receiving data: {}", e.getMessage());
+          return Mono.empty();
+        })
         .build();
   }
 
