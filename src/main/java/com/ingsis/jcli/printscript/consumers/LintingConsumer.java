@@ -48,37 +48,41 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
     return StreamReceiver.StreamReceiverOptions.builder()
         .pollTimeout(Duration.ofMillis(10000))
         .targetType(String.class)
-        .onErrorResume(e -> {
-          log.error("(LintingConsumer) Error occurred while receiving data: {}", e.getMessage());
-          return Mono.empty();
-        })
+        .onErrorResume(
+            e -> {
+              log.error(
+                  "(LintingConsumer) Error occurred while receiving data: {}", e.getMessage());
+              return Mono.empty();
+            })
         .build();
   }
 
   @Override
   protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
-    String lintRequest = objectRecord.getValue();
-    if (lintRequest == null) {
-      return;
-    }
+    try {
 
-    log.info("Received LintRequest value: {}", lintRequest);
+      String lintRequest = objectRecord.getValue();
 
-    LintOrFormatRequestProduct lintRequestProduct = deserializeIntoRequestProduct(lintRequest);
+      log.info("Received LintRequest value: {}", lintRequest);
 
-    ErrorResponse result =
-        printScriptService.analyze(
-            lintRequestProduct.getName(),
-            lintRequestProduct.getUrl(),
-            lintRequestProduct.getRules(),
-            lintRequestProduct.getVersion());
+      LintOrFormatRequestProduct lintRequestProduct = deserializeIntoRequestProduct(lintRequest);
 
-    if (result.error().isBlank() || result.error().isEmpty()) {
-      snippetStatusUpdateProducer.updateStatus(
-          lintRequestProduct.getSnippetId(), "lint", ProcessStatus.COMPLIANT);
-    } else {
-      snippetStatusUpdateProducer.updateStatus(
-          lintRequestProduct.getSnippetId(), "lint", ProcessStatus.NON_COMPLIANT);
+      ErrorResponse result =
+          printScriptService.analyze(
+              lintRequestProduct.getName(),
+              lintRequestProduct.getUrl(),
+              lintRequestProduct.getRules(),
+              lintRequestProduct.getVersion());
+
+      if (result.error().isBlank() || result.error().isEmpty()) {
+        snippetStatusUpdateProducer.updateStatus(
+            lintRequestProduct.getSnippetId(), "lint", ProcessStatus.COMPLIANT);
+      } else {
+        snippetStatusUpdateProducer.updateStatus(
+            lintRequestProduct.getSnippetId(), "lint", ProcessStatus.NON_COMPLIANT);
+      }
+    } catch (Exception e) {
+      log.error("Error processing message: {}", e.getMessage(), e);
     }
   }
 }
