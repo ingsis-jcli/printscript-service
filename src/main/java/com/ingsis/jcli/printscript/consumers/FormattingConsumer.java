@@ -55,6 +55,9 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
     if (formatRequest == null) {
       return;
     }
+
+    log.info("Received FormatRequest value: {}", formatRequest);
+
     LintOrFormatRequestProduct formatRequestProduct = deserializeIntoRequestProduct(formatRequest);
     FormatResponse result =
         printScriptService.format(

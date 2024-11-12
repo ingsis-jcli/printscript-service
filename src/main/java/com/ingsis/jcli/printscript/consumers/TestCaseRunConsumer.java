@@ -55,6 +55,9 @@ public class TestCaseRunConsumer extends RedisStreamConsumer<String> {
     if (testCase == null) {
       return;
     }
+
+    log.info("Received TestCaseRun value: {}", testCase);
+
     TestCaseProduct testCaseProduct = deserializeIntoTestCase(testCase);
     TestType type =
         printScriptService.runTestCase(

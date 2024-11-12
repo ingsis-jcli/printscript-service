@@ -56,6 +56,9 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
     if (lintRequest == null) {
       return;
     }
+
+    log.info("Received LintRequest value: {}", lintRequest);
+
     LintOrFormatRequestProduct lintRequestProduct = deserializeIntoRequestProduct(lintRequest);
 
     ErrorResponse result =
