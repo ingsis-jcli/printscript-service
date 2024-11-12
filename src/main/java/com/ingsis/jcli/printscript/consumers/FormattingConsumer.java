@@ -75,7 +75,7 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
       snippetStatusUpdateProducer.updateStatus(
           formatRequestProduct.getSnippetId(), "format", result.status());
     } catch (Exception e) {
-      log.error("Error processing message: {}", e.getMessage(), e);
+      log.error("(FormattingConsumer) Error processing message: {}", e.getMessage(), e);
     }
   }
 }

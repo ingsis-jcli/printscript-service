@@ -18,6 +18,7 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamReceiver;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Generated
 @Profile("!test")
@@ -46,26 +47,34 @@ public class TestCaseRunConsumer extends RedisStreamConsumer<String> {
     return StreamReceiver.StreamReceiverOptions.builder()
         .pollTimeout(Duration.ofMillis(10000))
         .targetType(String.class)
+        .onErrorResume(
+            e -> {
+              log.error(
+                  "(TestCaseRunConsumer) Error occurred while receiving data: {}", e.getMessage());
+              return Mono.empty();
+            })
         .build();
   }
 
   @Override
   protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
-    String testCase = objectRecord.getValue();
-    if (testCase == null) {
-      return;
+    try {
+
+      String testCase = objectRecord.getValue();
+
+      log.info("Received TestCaseRun value: {}", testCase);
+
+      TestCaseProduct testCaseProduct = deserializeIntoTestCase(testCase);
+      TestType type =
+          printScriptService.runTestCase(
+              testCaseProduct.getSnippetName(),
+              testCaseProduct.getUrl(),
+              testCaseProduct.getInput(),
+              testCaseProduct.getOutput(),
+              testCaseProduct.getVersion());
+      testResultProducer.returnResult(type, testCaseProduct.getId());
+    } catch (Exception e) {
+      log.error("(TestCaseRunConsumer) Error processing message: {}", e.getMessage(), e);
     }
-
-    log.info("Received TestCaseRun value: {}", testCase);
-
-    TestCaseProduct testCaseProduct = deserializeIntoTestCase(testCase);
-    TestType type =
-        printScriptService.runTestCase(
-            testCaseProduct.getSnippetName(),
-            testCaseProduct.getUrl(),
-            testCaseProduct.getInput(),
-            testCaseProduct.getOutput(),
-            testCaseProduct.getVersion());
-    testResultProducer.returnResult(type, testCaseProduct.getId());
   }
 }

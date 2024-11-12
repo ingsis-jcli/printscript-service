@@ -82,7 +82,7 @@ public class LintingConsumer extends RedisStreamConsumer<String> {
             lintRequestProduct.getSnippetId(), "lint", ProcessStatus.NON_COMPLIANT);
       }
     } catch (Exception e) {
-      log.error("Error processing message: {}", e.getMessage(), e);
+      log.error("(LintingConsumer) Error processing message: {}", e.getMessage(), e);
     }
   }
 }
