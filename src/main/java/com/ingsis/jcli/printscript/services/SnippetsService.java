@@ -54,4 +54,8 @@ public class SnippetsService {
   private String formatName(String name) {
     return URLEncoder.encode(name, StandardCharsets.UTF_8);
   }
+
+  public void deleteSnippet(String name, String container) {
+    bucketClient.deleteSnippet(container, formatName(name));
+  }
 }

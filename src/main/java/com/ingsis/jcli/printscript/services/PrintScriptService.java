@@ -92,7 +92,7 @@ public class PrintScriptService {
     log.info(marker, "Looking for snippet at container: " + url);
     InputStream code = snippetsService.getSnippetStream(name, url);
     ConsoleResult consoleResult = new ConsoleResult();
-
+    snippetsService.deleteSnippet(name, url);
     if (!availableVersions.contains(version)) {
       log.error(marker, "Invalid version: " + version);
       consoleResult.append("Invalid version: " + version);
