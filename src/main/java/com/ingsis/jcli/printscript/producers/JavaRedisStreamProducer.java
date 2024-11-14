@@ -1,10 +1,12 @@
 package com.ingsis.jcli.printscript.producers;
 
 import com.ingsis.jcli.printscript.common.Generated;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
 
+@Slf4j
 @Generated
 public abstract class JavaRedisStreamProducer {
   private final String streamKey;
@@ -17,6 +19,8 @@ public abstract class JavaRedisStreamProducer {
 
   public <T> RecordId emit(T value) {
     var record = StreamRecords.newRecord().ofObject(value).withStreamKey(streamKey);
+
+    log.info("Emitting value: {}", value);
 
     return redis.opsForStream().add(record);
   }

@@ -18,6 +18,7 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamReceiver;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Generated
 @Profile("!test")
@@ -46,24 +47,35 @@ public class FormattingConsumer extends RedisStreamConsumer<String> {
     return StreamReceiver.StreamReceiverOptions.builder()
         .pollTimeout(Duration.ofMillis(10000))
         .targetType(String.class)
+        .onErrorResume(
+            e -> {
+              log.error(
+                  "(FormattingConsumer) Error occurred while receiving data: {}", e.getMessage());
+              return Mono.empty();
+            })
         .build();
   }
 
   @Override
   protected void onMessage(@NotNull ObjectRecord<String, String> objectRecord) {
-    String formatRequest = objectRecord.getValue();
-    if (formatRequest == null) {
-      return;
-    }
-    LintOrFormatRequestProduct formatRequestProduct = deserializeIntoRequestProduct(formatRequest);
-    FormatResponse result =
-        printScriptService.format(
-            formatRequestProduct.getName(),
-            formatRequestProduct.getUrl(),
-            formatRequestProduct.getRules(),
-            formatRequestProduct.getVersion());
+    try {
+      String formatRequest = objectRecord.getValue();
 
-    snippetStatusUpdateProducer.updateStatus(
-        formatRequestProduct.getSnippetId(), "format", result.status());
+      log.info("Received FormatRequest value: {}", formatRequest);
+
+      LintOrFormatRequestProduct formatRequestProduct =
+          deserializeIntoRequestProduct(formatRequest);
+      FormatResponse result =
+          printScriptService.format(
+              formatRequestProduct.getName(),
+              formatRequestProduct.getUrl(),
+              formatRequestProduct.getRules(),
+              formatRequestProduct.getVersion());
+
+      snippetStatusUpdateProducer.updateStatus(
+          formatRequestProduct.getSnippetId(), "format", result.status());
+    } catch (Exception e) {
+      log.error("(FormattingConsumer) Error processing message: {}", e.getMessage(), e);
+    }
   }
 }

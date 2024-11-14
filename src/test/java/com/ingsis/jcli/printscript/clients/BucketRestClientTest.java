@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -45,5 +46,35 @@ class BucketRestClientTest {
 
     assertEquals(expectedContent, actualContent);
     verify(restTemplate, times(1)).exchange(url, HttpMethod.GET, null, String.class);
+  }
+
+  @Test
+  void saveSnippet_ShouldSendPutRequestWithContent() {
+    String key = "snippet-key";
+    String container = "snippet-container";
+    String content = "Snippet content";
+    String url = String.format("%s/asset/%s-%s", baseUrl, container, key);
+
+    HttpEntity<String> requestEntity = new HttpEntity<>(content);
+    when(restTemplate.exchange(eq(url), eq(HttpMethod.PUT), eq(requestEntity), eq(Void.class)))
+        .thenReturn(null);
+
+    bucketRestClient.saveSnippet(container, key, content);
+
+    verify(restTemplate, times(1)).exchange(url, HttpMethod.PUT, requestEntity, Void.class);
+  }
+
+  @Test
+  void deleteSnippet_ShouldSendDeleteRequest() {
+    String key = "snippet-key";
+    String container = "snippet-container";
+    String url = String.format("%s/asset/%s-%s", baseUrl, container, key);
+
+    when(restTemplate.exchange(eq(url), eq(HttpMethod.DELETE), eq(null), eq(Void.class)))
+        .thenReturn(null);
+
+    bucketRestClient.deleteSnippet(container, key);
+
+    verify(restTemplate, times(1)).exchange(url, HttpMethod.DELETE, null, Void.class);
   }
 }
